@@ -1,0 +1,951 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+\usepackage{../theme}
+
+% METADATA
+
+\title{Ciclo de Vida del Código}
+\subtitle{Estados del Código en Git}
+\author{GLUD --- Grupo GNU/Linux Universidad Distrital}
+\date{Control de Versiones y Desarrollo Colaborativo}
+
+% DOCUMENT
+
+\begin{document}
+
+% Portada
+\titleframe[Clase 2 · Ciclo de Vida del Código]
+
+\contentsframe
+
+% SECTION 1: ESTADOS DE ARCHIVOS
+
+\section{Estados de Archivos}
+
+\begin{frame}{El Ciclo de Vida de un Archivo en Git}
+    \vspace{0.3cm}
+    \centering
+    
+    \begin{tikzpicture}[scale=0.9]
+        % Untracked
+        \fill[gludLightGray] (0,0) rectangle (3,2);
+        \node[text=gludDark,font=\bfseries] at (1.5,1.3) {Untracked};
+        \node[text=gludGray,font=\tiny] at (1.5,0.5) {Sin rastrear};
+        
+        \pause
+        
+        % Arrow 1
+        \draw[->,thick,gludOrange] (3.2,1) -- (4.5,1);
+        \node[text=gludWhite,font=\tiny] at (3.85,1.4) {git add};
+        
+        % Staged
+        \fill[gludOrange] (4.7,0) rectangle (7.7,2);
+        \node[text=gludWhite,font=\bfseries] at (6.2,1.3) {Staged};
+        \node[text=gludPeach,font=\tiny] at (6.2,0.5) {Preparado};
+        
+        \pause
+        
+        % Arrow 2
+        \draw[->,thick,gludOrange] (7.9,1) -- (9.2,1);
+        \node[text=gludWhite,font=\tiny] at (8.55,1.4) {git commit};
+        
+        % Committed/Unmodified
+        \fill[gludDarker] (9.4,0) rectangle (12.4,2);
+        \draw[gludOrange,thick] (9.4,0) rectangle (12.4,2);
+        \node[text=gludWhite,font=\bfseries] at (10.9,1.3) {Committed};
+        \node[text=gludLightGray,font=\tiny] at (10.9,0.5) {Sin modificar};
+        
+        \pause
+        
+        % Arrow 3 (modify) -> curve up to the top of the Modified box
+        \draw[->,thick,gludOrange] (10.9,2.2) .. controls (10.9,4.0) and (8.7,4.3) .. (7.9,4.0);
+        \node[text=gludWhite,font=\tiny] at (8.8,3.8) {editar archivo};
+        
+        % Modified
+        \fill[gludPeach] (4.7,2.5) rectangle (7.7,4.5);
+        \node[text=gludDark,font=\bfseries] at (6.2,3.8) {Modified};
+        \node[text=gludGray,font=\tiny] at (6.2,3) {Modificado};
+        
+        \pause
+        
+        % Arrow back to staged
+        \draw[->,thick,gludOrange] (6.2,2.4) -- (6.2,2.1);
+        \node[text=gludWhite,font=\tiny,anchor=west] at (6.5,2.3) {git add};
+    \end{tikzpicture}
+    
+    \vspace{0.4cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.32\textwidth}
+            \centering
+            \circled{1} \highlight{Untracked}
+            
+            {\tiny Archivo nuevo, Git no lo conoce}
+        \end{column}
+        \begin{column}{0.32\textwidth}
+            \centering
+            \circled{2} \highlight{Staged}
+            
+            {\tiny Listo para commit}
+        \end{column}
+        \begin{column}{0.32\textwidth}
+            \centering
+            \circled{3} \highlight{Committed}
+            
+            {\tiny Guardado en historial}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Estado: Untracked}
+    
+    \begin{orangebox}[Definición]
+        Un archivo \highlight{Untracked} es un archivo nuevo que Git aún no está rastreando.
+    \end{orangebox}
+
+    \pause
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{codebox}[Crear archivo]
+                \ttfamily\small\color{gludWhite}
+                echo "Hola" > nuevo.txt\\
+                git status
+            \end{codebox}
+            
+            \textbf{Características:}
+            \begin{itemize}
+                \item Git lo detecta pero no lo sigue
+                \item Aparece en rojo en \texttt{git status}
+                \item No se incluye en commits
+            \end{itemize}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \begin{codebox}[Salida de git status]
+                \ttfamily\tiny\color{gludWhite}
+                Untracked files:\\
+                \hspace{0.5cm}(use "git add..." )\\[4pt]
+                \hspace{1cm}{\color{red}nuevo.txt}
+            \end{codebox}
+            
+            \vspace{0.3cm}
+            
+            {\small\color{gludLightGray} Usa \texttt{git add} para comenzar a rastrearlo}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Estado: Staged}
+    
+    \begin{orangebox}[Definición]
+        Un archivo \highlight{Staged} está en el área de preparación, listo para ser confirmado.
+    \end{orangebox}
+    
+    \pause
+    
+    \begin{codebox}[Agregar al staging]
+        \ttfamily\color{gludWhite}
+        git add nuevo.txt\\
+        git status
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[Salida de git status]
+        \ttfamily\tiny\color{gludWhite}
+        Changes to be committed:\\
+        \hspace{0.5cm}(use "git restore -{}-staged..." to unstage)\\[4pt]
+        \hspace{1cm}{\color{green}new file:   nuevo.txt}
+    \end{codebox}
+    
+\end{frame}
+
+\begin{frame}{Estado: Committed / Unmodified}
+    
+    \begin{orangebox}[Definición]
+        Un archivo \highlight{Committed} está guardado en el historial de Git y no ha sido modificado desde el último commit.
+    \end{orangebox}
+    
+    \pause
+    
+    \begin{codebox}[Crear commit]
+        \ttfamily\color{gludWhite}
+        git commit -m "feat: agregar archivo nuevo"\\
+        git status
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[Salida de git status]
+        \ttfamily\small\color{gludWhite}
+        On branch main\\
+        nothing to commit, working tree clean
+    \end{codebox}
+
+\end{frame}
+
+\begin{frame}{Estado: Modified}
+    
+    \begin{orangebox}[Definición]
+        Un archivo \highlight{Modified} ha sido editado desde el último commit pero aún no está en staging.
+    \end{orangebox}
+    
+    \pause
+    
+    \begin{codebox}[Modificar archivo]
+        \ttfamily\color{gludWhite}
+        echo "Línea nueva" >> nuevo.txt\\
+        git status
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[Salida de git status]
+        \ttfamily\tiny\color{gludWhite}
+        Changes not staged for commit:\\
+        \hspace{0.5cm}(use "git add..." to update)\\
+        \hspace{0.5cm}(use "git restore..." to discard)\\[4pt]
+        \hspace{1cm}{\color{red}modified:   nuevo.txt}
+    \end{codebox}
+    
+\end{frame}
+
+\begin{frame}{Comandos de Control de Estado}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{codebox}[Ver estado]
+                \ttfamily\small\color{gludWhite}
+                git status\\[4pt]
+                git status -s
+            \end{codebox}
+            
+            \vspace{0.3cm}
+            
+            \begin{codebox}[Sacar de staging]
+                \ttfamily\small\color{gludWhite}
+                git restore -{}-staged\\
+                \hspace{0.5cm}archivo.txt
+            \end{codebox}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \begin{codebox}[Descartar cambios]
+                \ttfamily\small\color{gludWhite}
+                git restore archivo.txt
+            \end{codebox}
+            
+            \vspace{0.3cm}
+            
+            \begin{alertbox}[Cuidado]
+                \texttt{git restore} sin \texttt{-{}-staged} descarta cambios permanentemente
+            \end{alertbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% SECTION 2: CONVENTIONAL COMMITS
+
+\section{Conventional Commits}
+
+\begin{frame}{¿Qué son los Conventional Commits?}
+    
+    \begin{orangebox}[Definición]
+        \highlight{Conventional Commits} es una convención para escribir mensajes de commit estructurados y significativos.
+    \end{orangebox}
+
+    \pause
+    
+    \begin{codebox}[Estructura]
+        \ttfamily\small\color{gludWhite}
+        <tipo>[ámbito opcional]: <descripción>\\[6pt]
+        [cuerpo opcional]\\[6pt]
+        [nota(s) al pie opcional(es)]
+    \end{codebox}
+    
+    \pause
+    
+    \centering
+    \textbf{Ventajas:}
+    
+    \vspace{0.2cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.32\textwidth}
+            \centering
+            {\small Historial legible}
+        \end{column}
+        \begin{column}{0.32\textwidth}
+            \centering
+            {\small Automatización}
+        \end{column}
+        \begin{column}{0.32\textwidth}
+            \centering
+            {\small Comunicación clara}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Tipos de Commit}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{Cambios principales:}
+            \begin{itemize}
+                \item \highlight{feat}: Nueva funcionalidad
+                \item \highlight{fix}: Corrección de bug
+                \item \highlight{refactor}: Cambio de código sin nueva función
+                \item \highlight{perf}: Mejora de rendimiento
+            \end{itemize}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \textbf{Cambios auxiliares:}
+            \begin{itemize}
+                \item \highlight{docs}: Documentación
+                \item \highlight{style}: Formato (espacios, etc.)
+                \item \highlight{test}: Agregar/modificar tests
+                \item \highlight{chore}: Tareas de mantenimiento
+                \item \highlight{build}: Cambios en build
+                \item \highlight{ci}: Integración continua
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Ejemplos de Conventional Commits}
+    \vspace{0.3cm}
+    
+    \begin{codebox}[feat: Nueva funcionalidad]
+        \ttfamily\small\color{gludWhite}
+        git commit -m "feat: agregar validación de email"\\
+        git commit -m "feat(auth): implementar login con JWT"
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[fix: Corrección]
+        \ttfamily\small\color{gludWhite}
+        git commit -m "fix: corregir cálculo de total"\\
+        git commit -m "fix(api): resolver error 500 en endpoint"
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[docs: Documentación]
+        \ttfamily\small\color{gludWhite}
+        git commit -m "docs: actualizar README con instrucciones"\\
+        git commit -m "docs(api): documentar endpoint de usuarios"
+    \end{codebox}
+\end{frame}
+
+\begin{frame}{Más Ejemplos}
+    \vspace{0.3cm}
+    
+    \begin{codebox}[refactor: Refactorización]
+        \ttfamily\small\color{gludWhite}
+        git commit -m "refactor: simplificar lógica de validación"\\
+        git commit -m "refactor(service): extraer clase helper"
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[chore: Tareas de mantenimiento]
+        \ttfamily\small\color{gludWhite}
+        git commit -m "chore: actualizar dependencias"\\
+        git commit -m "chore: configurar .gitignore"
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[test: Pruebas]
+        \ttfamily\small\color{gludWhite}
+        git commit -m "test: agregar tests unitarios"\\
+        git commit -m "test(user): validar creación de usuario"
+    \end{codebox}
+\end{frame}
+
+\begin{frame}{Commits con Breaking Changes}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Breaking Change]
+        Un \highlight{breaking change} es un cambio que rompe la compatibilidad con versiones anteriores.
+    \end{orangebox}
+    
+    \pause
+    
+    \begin{codebox}[Sintaxis con !]
+        \ttfamily\small\color{gludWhite}
+        git commit -m "feat!: cambiar estructura de API"\\
+        git commit -m "refactor(core)!: renombrar métodos principales"
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[Con nota al pie]
+        \ttfamily\tiny\color{gludWhite}
+        git commit -m "feat: cambiar endpoint de login\\[4pt]
+        BREAKING CHANGE: el endpoint cambió de /auth a /api/v2/auth"
+    \end{codebox}
+\end{frame}
+
+\quoteslide{A commit message should tell a story about what changed and why.}{Linus Torvalds}
+
+% SECTION 3: ESTRUCTURA DE PROYECTO
+
+\section{Estructura de Proyecto}
+
+\begin{frame}{Proyecto Maven Estándar}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+                    \begin{codebox}[Estructura]
+                        \ttfamily\tiny\color{gludWhite}
+                        mi-proyecto/\\
+                        - pom.xml\\
+                        - README.md\\
+                        - .gitignore\\
+                        - src/\\
+                        \hspace*{0.25cm}- main/\\
+                        \hspace*{0.5cm}- java/\\
+                        \hspace*{0.75cm}- com/ejemplo/\\
+                        \hspace*{1cm}- Main.java\\
+                        \hspace*{1cm}- modelo/\\
+                        \hspace*{0.25cm}- resources/\\
+                        \hspace*{0.25cm}- test/\\
+                        \hspace*{0.5cm}- java/
+                    \end{codebox}
+                \end{column}
+                \pause
+                \begin{column}{0.48\textwidth}
+                    \textbf{Archivos clave:}
+                    \begin{itemize}
+                        \item \inlinecode{pom.xml}: Configuración Maven
+                        \item \inlinecode{README.md}: Documentación
+                        \item \inlinecode{.gitignore}: Archivos a ignorar
+                        \item \inlinecode{src/main/java}: Código fuente
+                        \item \inlinecode{src/test/java}: Pruebas
+                    \end{itemize}
+                \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Proyecto Python con UV}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+                    \begin{codebox}[Estructura]
+                        \ttfamily\tiny\color{gludWhite}
+                        mi-proyecto/\\
+                        - pyproject.toml\\
+                        - README.md\\
+                        - .gitignore\\
+                        - .python-version\\
+                        - src/\\
+                        \hspace*{0.25cm}- mi\_proyecto/\\
+                        \hspace*{0.5cm}- \_\_init\_\_.py\\
+                        \hspace*{0.5cm}- main.py\\
+                        \hspace*{0.5cm}- utils.py\\
+                        - tests/\\
+                        \hspace*{0.25cm}- test\_main.py\\
+                        \hspace*{0.25cm}- test\_utils.py
+                    \end{codebox}
+                \end{column}
+                \pause
+                \begin{column}{0.48\textwidth}
+                    \textbf{Archivos clave:}
+                    \begin{itemize}
+                        \item \inlinecode{pyproject.toml}: Configuración UV y dependencias
+                        \item \inlinecode{README.md}: Documentación
+                        \item \inlinecode{.gitignore}: Archivos a ignorar
+                        \item \inlinecode{.python-version}: Versión de Python
+                        \item \inlinecode{src/}: Código fuente
+                        \item \inlinecode{tests/}: Pruebas unitarias
+                    \end{itemize}
+                \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Crear Proyecto con UV}
+    \vspace{0.3cm}
+    
+    \step{1}{Crear proyecto desde cero}
+    
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        uv init mi-proyecto\\
+        cd mi-proyecto
+    \end{codebox}
+    
+    \pause
+    
+    \step{2}{UV crea automáticamente}
+    
+    \begin{itemize}
+        \item Estructura de directorios completa
+        \item \texttt{pyproject.toml} configurado
+        \item Archivo \texttt{main.py} de ejemplo
+        \item Archivo \texttt{.python-version}
+    \end{itemize}
+    
+    \pause
+    
+    \step{3}{Instalar dependencias}
+    
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        uv sync
+    \end{codebox}
+\end{frame}
+
+\begin{frame}{.gitignore para Python/UV}
+    
+    \begin{codebox}[.gitignore]
+        \ttfamily\small\color{gludWhite}
+        \# Entorno virtual\\
+        .venv/\\
+        venv/\\
+        \_\_pycache\_\_/\\
+        *.pyc\\
+        *.pyo\\
+        dist/\\
+        build/\\
+        *.egg-info/\\
+        *.log\\
+        \# Variables de entorno\\
+        .env\\
+        .env.local
+    \end{codebox}
+\end{frame}
+
+\begin{frame}{Crear Estructura con Maven}
+    \vspace{0.3cm}
+    
+    \step{1}{Crear proyecto desde arqueotipo}
+    
+    \begin{codebox}
+        \ttfamily\tiny\color{gludWhite}
+        mvn archetype:generate\\
+        \hspace{0.5cm}-DgroupId=com.ejemplo\\
+        \hspace{0.5cm}-DartifactId=mi-proyecto\\
+        \hspace{0.5cm}-DarchetypeArtifactId=maven-archetype-quickstart\\
+        \hspace{0.5cm}-DinteractiveMode=false
+    \end{codebox}
+    
+    \pause
+    
+    \step{2}{Maven crea automáticamente}
+    
+    \begin{itemize}
+        \item Estructura de directorios completa
+        \item \texttt{pom.xml} configurado
+        \item Clase \texttt{App.java} de ejemplo
+        \item Clase de test \texttt{AppTest.java}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{El archivo pom.xml}
+    \vspace{0.3cm}
+    
+    \begin{codebox}[pom.xml básico]
+        \ttfamily\tiny\color{gludWhite}
+        <project>\\
+        \hspace{0.5cm}<modelVersion>4.0.0</modelVersion>\\
+        \hspace{0.5cm}<groupId>com.ejemplo</groupId>\\
+        \hspace{0.5cm}<artifactId>mi-proyecto</artifactId>\\
+        \hspace{0.5cm}<version>1.0-SNAPSHOT</version>\\[6pt]
+        \hspace{0.5cm}<properties>\\
+        \hspace{1cm}<maven.compiler.source>21</maven.compiler.source>\\
+        \hspace{1cm}<maven.compiler.target>21</maven.compiler.target>\\
+        \hspace{0.5cm}</properties>\\[6pt]
+        \hspace{0.5cm}<dependencies>\\
+        \hspace{1cm}<!-- tus dependencias -->\\
+        \hspace{0.5cm}</dependencies>\\
+        </project>
+    \end{codebox}
+\end{frame}
+
+\begin{frame}{README.md: Carta de Presentación}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Importancia]
+        El \highlight{README.md} es lo primero que ven otros desarrolladores. Debe ser claro y completo.
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \textbf{Secciones recomendadas:}
+    \begin{itemize}
+        \item Título y descripción del proyecto
+        \item Requisitos (Java 21, Maven 3.X)
+        \item Instrucciones de instalación
+        \item Cómo ejecutar el proyecto
+        \item Ejemplos de uso
+        \item Licencia
+        \item Contacto/contribución
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Ejemplo de README.md}
+    \vspace{0.3cm}
+    
+    \begin{codebox}[README.md]
+        \ttfamily\tiny\color{gludWhite}
+        \# Mi Proyecto\\[4pt]
+        Descripción breve del proyecto.\\[6pt]
+        \#\# Requisitos\\
+        - Java 21+\\
+        - Maven 3.8+\\[6pt]
+        \#\# Instalación\\
+        ```bash\\
+        git clone https://github.com/usuario/mi-proyecto.git\\
+        cd mi-proyecto\\
+        mvn clean install\\
+        ```\\[6pt]
+        \#\# Uso\\
+        ```bash\\
+        mvn exec:java -Dexec.mainClass="com.ejemplo.Main"\\
+        ```
+    \end{codebox}
+\end{frame}
+
+% SECTION 4: GITIGNORE
+
+\section{Configuración de .gitignore}
+
+\begin{frame}{¿Por qué usar .gitignore?}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Propósito]
+        El archivo \highlight{.gitignore} indica a Git qué archivos \textbf{no} debe rastrear.
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \textbf{Archivos a ignorar:}
+    \begin{itemize}
+        \item Archivos compilados (\texttt{*.class}, \texttt{target/})
+        \item Archivos de configuración local (\texttt{.vscode/}, \texttt{.idea/})
+        \item Dependencias descargadas (\texttt{node\_modules/})
+        \item Archivos de sistema (\texttt{.DS\_Store}, \texttt{Thumbs.db})
+        \item Logs y temporales (\texttt{*.log}, \texttt{*.tmp})
+        \item Credenciales y secretos (\texttt{.env}, \texttt{secrets.yml})
+    \end{itemize}
+    
+    \vspace{0.3cm}
+    
+    \centering
+    {\color{gludOrangeLight} Nunca subas contraseñas, tokens o API keys}
+\end{frame}
+
+\begin{frame}{.gitignore para Java/Maven}
+    
+    \begin{codebox}[.gitignore]
+        \ttfamily\small\color{gludWhite}
+        \# Archivos compilados\\
+        *.class\\
+        *.jar\\
+        *.war\\[6pt]
+        \# Directorio de Maven\\
+        target/\\[6pt]
+        \# IDEs\\
+        .idea/\\
+        .vscode/\\[6pt]
+        \# Logs\\
+        *.log
+    \end{codebox}
+\end{frame}
+
+\begin{frame}{Usando gitignore.io}
+    
+    \begin{orangebox}[¿Qué es gitignore.io?]
+        \highlight{gitignore.io} es un servicio que genera archivos .gitignore automáticamente según tu stack tecnológico.
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \step{1}{Visita \url{https://www.toptal.com/developers/gitignore}}
+    
+    \vspace{0.2cm}
+    \pause
+    
+    \step{2}{Escribe: \texttt{Java}, \texttt{Maven}, \texttt{IntelliJ}, \texttt{VisualStudioCode}}
+    
+    \vspace{0.2cm}
+    \pause
+    
+    \step{3}{Copia el contenido generado a tu \texttt{.gitignore}}
+    
+    \vspace{0.3cm}
+    
+    \centering
+    {\color{gludLightGray} También puedes usar la API o CLI: \texttt{gi java,maven > .gitignore}}
+\end{frame}
+
+\begin{frame}{Aplicar .gitignore a Archivos Rastreados}
+    
+    \begin{alertbox}[Problema]
+        Si ya agregaste archivos a Git antes de crear .gitignore, seguirán siendo rastreados.
+    \end{alertbox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \begin{codebox}[Solución]
+        \ttfamily\small\color{gludWhite}
+        \# Remover del índice (sin borrar del disco)\\
+        git rm -{}-cached -r target/\\[6pt]
+        \# Agregar .gitignore\\
+        git add .gitignore\\[6pt]
+        \# Commit\\
+        git commit -m "chore: configurar .gitignore para Java/Maven"
+    \end{codebox}
+    
+    \vspace{0.3cm}
+    
+    \centering
+    {\color{gludOrangeLight} Ahora \texttt{target/} será ignorado en futuros commits}
+\end{frame}
+
+\begin{frame}{Patrones Comunes en .gitignore}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{codebox}[Patrones]
+                \ttfamily\small\color{gludWhite}
+                \# Archivo específico\\
+                config.local\\[4pt]
+                \# Extensión\\
+                *.log\\[4pt]
+                \# Directorio\\
+                build/\\[4pt]
+                \# Todos menos uno\\
+                *.jar\\
+                !lib/importante.jar
+            \end{codebox}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \begin{codebox}[Más patrones]
+                \ttfamily\small\color{gludWhite}
+                \# Cualquier nivel\\
+                **/temp/\\[4pt]
+                \# En raíz solamente\\
+                /TODO\\[4pt]
+                \# Comentario\\
+                \# esto es un comentario\\[4pt]
+                \# Negación\\
+                !importante.txt
+            \end{codebox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% SECTION 6: BUENAS PRÁCTICAS
+
+\section{Buenas Prácticas}
+
+\begin{frame}{Commits Atómicos}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Concepto]
+        Un \highlight{commit atómico} contiene un único cambio lógico y completo.
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{darkbox}[Bien]
+                \begin{itemize}
+                    \item Un bug, un commit
+                    \item Una feature, uno o más commits
+                    \item Cada commit compila
+                    \item Mensajes descriptivos
+                \end{itemize}
+            \end{darkbox}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \begin{orangebox}[Mal]
+                \begin{itemize}
+                    \item {\color{black}Múltiples features en un commit}
+                    \item {\color{black}Commit con código roto}
+                    \item {\color{black}Mensajes vagos: "fix", "cambios"}
+                    \item {\color{black}Commits gigantes}
+                \end{itemize}
+            \end{orangebox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Reglas de Oro para Commits}
+    \vspace{0.3cm}
+    
+    \begin{enumerate}
+        \item \textbf{Commit frecuentemente} --- No esperes al final del día
+        \pause
+        \item \textbf{Usa Conventional Commits} --- Historial legible y profesional
+        \pause
+        \item \textbf{Revisa antes de commitear} --- Usa \texttt{git diff} y \texttt{git status}
+        \pause
+        \item \textbf{No subas archivos generados} --- Usa .gitignore correctamente
+        \pause
+        \item \textbf{Nunca subas secretos} --- Contraseñas, tokens, API keys fuera
+        \pause
+        \item \textbf{Escribe mensajes claros} --- Piensa en tus compañeros
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Checklist Antes de Commitear}
+    \vspace{0.3cm}
+    
+    \centering
+    
+    \begin{tikzpicture}
+        \node[draw=gludOrange,thick,fill=gludDark,text=gludWhite,rounded corners,text width=10cm,align=left,font=\small] {%
+            \textbf{Antes de hacer commit:}\\[8pt]
+            $\square$ ¿El código compila? (\texttt{mvn compile})\\
+            $\square$ ¿Revisé los cambios? (\texttt{git diff})\\
+            $\square$ ¿Agregué solo lo necesario? (\texttt{git status})\\
+            $\square$ ¿El mensaje es descriptivo?\\
+            $\square$ ¿Sigo Conventional Commits?\\
+            $\square$ ¿No hay archivos generados?\\
+            $\square$ ¿No hay secretos/contraseñas?
+        };
+    \end{tikzpicture}
+\end{frame}
+
+\quoteslide{Commit early, commit often.}{Git Best Practices}
+
+% SECTION 7: RESUMEN
+
+\section{Resumen}
+
+\begin{frame}{Lo que Aprendimos}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{Estados de archivos:}
+            \begin{itemize}
+                \item Untracked
+                \item Staged
+                \item Committed / Unmodified
+                \item Modified
+            \end{itemize}
+            
+            \vspace{0.3cm}
+            
+            \textbf{Conventional Commits:}
+            \begin{itemize}
+                \item Tipos: feat, fix, docs, etc.
+                \item Estructura clara
+                \item Breaking changes
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \textbf{Estructura de proyecto:}
+            \begin{itemize}
+                \item Maven estándar
+                \item pom.xml
+                \item README.md
+            \end{itemize}
+            
+            \vspace{0.3cm}
+            
+            \textbf{.gitignore:}
+            \begin{itemize}
+                \item Ignorar compilados
+                \item Ignorar IDEs
+                \item Usar gitignore.io
+                \item Patrones comunes
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Comandos Clave}
+    \vspace{0.3cm}
+    
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        \# Estados\\
+        git status\\[6pt]
+        \# Staging\\
+        git add archivo.txt\\
+        git restore -{}-staged archivo.txt\\[6pt]
+        \# Commits\\
+        git commit -m "feat: nueva funcionalidad"\\[6pt]
+        \# Diferencias\\
+        git diff\\
+        git diff -{}-staged\\[6pt]
+        \# Descartar cambios\\
+        git restore archivo.txt
+    \end{codebox}
+\end{frame}
+
+\begin{frame}{Recursos}
+    \vspace{0.5cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{Conventional Commits:}
+            \begin{itemize}
+                \item \url{https://www.conventionalcommits.org}
+                \item Especificación completa
+                \item Ejemplos y guías
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \textbf{.gitignore:}
+            \begin{itemize}
+                \item \url{https://www.toptal.com/developers/gitignore}
+                \item Templates oficiales
+                \item GitHub gitignore repo
+            \end{itemize}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    
+    \textbf{Maven:}
+    \begin{itemize}
+        \item \url{https://maven.apache.org/guides/}
+        \item Maven in 5 Minutes
+        \item POM Reference
+    \end{itemize}
+\end{frame}
+
+% Next class preview
+
+\begin{frame}[plain]
+\setbeamercolor{background canvas}{bg=gludPeach}
+\vspace{1.5cm}
+\centering
+
+{\Huge\color{gludOrange}\bfseries Próxima Clase}
+
+\vspace{0.5cm}
+
+{\Large\color{gludDark} Viajes en el Tiempo}
+
+\vspace{1cm}
+
+{\large\color{gludWhite} Historial (git log). Diferencias (git diff avanzado). Restauración (checkout/restore). Etiquetas (tags) para versiones.}
+\end{frame}
+
+% Despedida
+
+\thankslide{¡Gracias!\\[0.3cm]{\hspace*{1cm}\Large Nos vemos en la próxima clase}}
+
+\end{document}
