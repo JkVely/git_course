@@ -1,0 +1,710 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+\usepackage{../theme}
+\usepackage{colortbl}
+
+% METADATA
+
+\title{Flujos Remotos}
+\subtitle{GitHub, GitLab y el Mundo Exterior}
+\author{GLUD --- Grupo GNU/Linux Universidad Distrital}
+\date{Control de Versiones y Desarrollo Colaborativo}
+
+% DOCUMENT
+
+\begin{document}
+
+% Portada
+\titleframe[Clase 6 · Flujos Remotos]
+
+\contentsframe
+
+% ============================================================================
+% SECTION 1: INTRODUCCIÓN
+% ============================================================================
+
+\section{Del Local al Remoto}
+
+\begin{frame}{Git es Distribuido}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Recordatorio]
+        Git es un sistema de control de versiones \highlight{distribuido}. Cada clon es un repositorio completo.
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{Hasta ahora:}
+            \begin{itemize}
+                \item Todo en tu máquina local
+                \item Commits, ramas, merges
+                \item Sin conexión a internet
+                \item Solo tú tienes acceso
+            \end{itemize}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \textbf{Ahora:}
+            \begin{itemize}
+                \item Conectar con servidores remotos
+                \item Compartir código con el equipo
+                \item Respaldo en la nube
+                \item Colaboración real
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{GitHub vs GitLab vs Otros}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.32\textwidth}
+            \begin{darkbox}[GitHub]
+                {\color{gludWhite}
+                \begin{itemize}
+                    \item El más popular
+                    \item Propiedad de Microsoft
+                    \item GitHub Actions
+                    \item Comunidad enorme
+                \end{itemize}
+                }
+            \end{darkbox}
+        \end{column}
+        \begin{column}{0.32\textwidth}
+            \begin{darkbox}[GitLab]
+                {\color{gludWhite}
+                \begin{itemize}
+                    \item Open source
+                    \item Self-hosted posible
+                    \item CI/CD integrado
+                    \item Todo en uno
+                \end{itemize}
+                }
+            \end{darkbox}
+        \end{column}
+        \begin{column}{0.32\textwidth}
+            \begin{darkbox}[Otros]
+                {\color{gludWhite}
+                \begin{itemize}
+                    \item Bitbucket (Atlassian)
+                    \item Gitea (self-hosted)
+                    \item Azure DevOps
+                    \item Codeberg
+                \end{itemize}
+                }
+            \end{darkbox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \centering
+    {\color{gludOrangeLight} Los comandos de Git son los mismos --- solo cambia la interfaz web}
+\end{frame}
+
+% ============================================================================
+% SECTION 2: AUTENTICACIÓN SSH
+% ============================================================================
+
+\section{Autenticación SSH}
+
+\begin{frame}{¿Por Qué SSH?}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{darkbox}[HTTPS]
+                {\color{gludWhite}
+                \textbf{URL:} \texttt{https://github.com/user/repo.git}
+                
+                \vspace{0.2cm}
+                
+                \begin{itemize}
+                    \item Pide usuario/contraseña
+                    \item Necesita token de acceso
+                    \item Más fácil de configurar
+                    \item Puede ser tedioso
+                \end{itemize}
+                }
+            \end{darkbox}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \begin{darkbox}[SSH]
+                {\color{gludWhite}
+                \textbf{URL:} \texttt{git@github.com:user/repo.git}
+                
+                \vspace{0.2cm}
+                
+                \begin{itemize}
+                    \item Usa clave pública/privada
+                    \item Sin contraseñas repetidas
+                    \item Más seguro
+                    \item Configuración inicial
+                \end{itemize}
+                }
+            \end{darkbox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.4cm}
+    
+    \centering
+    {\color{gludOrangeLight} Recomendación: Usar SSH para desarrollo profesional}
+\end{frame}
+
+\begin{frame}{Criptografía de Clave Pública}
+    \vspace{0.3cm}
+    
+    \begin{center}
+        \begin{tikzpicture}[
+            box/.style={rectangle, rounded corners, fill=gludDarker, text=gludWhite, font=\small, inner sep=10pt, minimum width=3cm, text width=2.8cm, align=center},
+            arrow/.style={->, thick, gludOrangeLight}
+        ]
+            \node[box] (priv) at (0,0) {Clave Privada\\{\tiny\ttfamily id\_ed25519}\\{\scriptsize (SECRETA)}};
+            \node[box] (pub) at (5,0) {Clave Pública\\{\tiny\ttfamily id\_ed25519.pub}\\{\scriptsize (Compartible)}};
+            \node[box, fill=gludOrange] (server) at (10,0) {GitHub/GitLab\\{\scriptsize (Tu clave pública)}};
+            
+            \draw[arrow] (priv) -- node[above, font=\tiny] {genera} (pub);
+            \draw[arrow] (pub) -- node[above, font=\tiny] {sube} (server);
+            
+            \node[text=gludLightGray, font=\scriptsize] at (0,-1.5) {Nunca compartas};
+            \node[text=gludLightGray, font=\scriptsize] at (5,-1.5) {Puedes compartir};
+        \end{tikzpicture}
+    \end{center}
+    
+    \pause
+    
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Analogía]
+        {\color{black}La clave pública es como un candado que regalas. Solo tú tienes la llave (clave privada) para abrirlo.}
+    \end{orangebox}
+\end{frame}
+
+\begin{frame}{Generar Par de Claves SSH}
+    
+    \begin{codebox}[Generar clave (algoritmo moderno)]
+        \ttfamily\color{gludWhite}
+        ssh-keygen -t ed25519 -C "tu@email.com"
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[Preguntas interactivas]
+        \ttfamily\tiny\color{gludWhite}
+        Enter file in which to save the key (/home/user/.ssh/id\_ed25519): [Enter]\\
+        Enter passphrase (empty for no passphrase): [opcional]\\
+        Enter same passphrase again: [opcional]
+    \end{codebox}
+    
+    \pause
+    
+    \begin{alertbox}[Passphrase]
+        {\color{black}La passphrase es una capa extra de seguridad. Si la usas, deberás ingresarla cada vez (o usar ssh-agent).}
+    \end{alertbox}
+\end{frame}
+
+\begin{frame}{Ubicación de las Claves}
+    \vspace{0.3cm}
+    
+    \begin{codebox}[Las claves se guardan en:]
+        \ttfamily\small\color{gludWhite}
+        \# Linux/macOS\\
+        \textasciitilde/.ssh/id\_ed25519\ \ \ \ \ \# Clave PRIVADA\\
+        \textasciitilde/.ssh/id\_ed25519.pub\ \# Clave PÚBLICA\\
+    \end{codebox}
+    
+    \vspace{0.3cm}
+    \pause
+    
+    \begin{codebox}[Ver tu clave pública]
+        \ttfamily\color{gludWhite}
+        cat \textasciitilde/.ssh/id\_ed25519.pub
+    \end{codebox}
+    
+    \vspace{0.2cm}
+    
+    {\scriptsize\color{gludLightGray} Salida: \texttt{ssh-ed25519 AAAAC3NzaC1lZDI... tu@email.com}}
+\end{frame}
+
+\begin{frame}{Agregar Clave a GitHub}
+    \vspace{0.3cm}
+    
+    \step{1}{Copiar tu clave pública}
+    
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        \# Linux\\
+        cat \textasciitilde/.ssh/id\_ed25519.pub | xclip -selection clipboard\\
+    \end{codebox}
+    
+    \pause
+    
+    \step{2}{En GitHub/GitLab}
+    
+    {\small Settings → SSH and GPG Keys → New SSH Key → Pegar → Add}
+\end{frame}
+ 
+\begin{frame}{Verificar Conexión SSH}
+    
+    \begin{codebox}[Probar conexión con GitHub]
+        \ttfamily\color{gludWhite}
+        ssh -T git@github.com
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[Respuesta exitosa]
+        \ttfamily\small\color{gludWhite}
+        Hi username! You've successfully authenticated, but GitHub\\
+        does not provide shell access.
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[Probar conexión con GitLab]
+        \ttfamily\color{gludWhite}
+        ssh -T git@gitlab.com
+    \end{codebox}
+    
+    
+    {\color{gludOrangeLight} Si funciona, ya puedes clonar y pushear sin contraseña}
+\end{frame}
+
+% ============================================================================
+% SECTION 3: REPOSITORIOS REMOTOS
+% ============================================================================
+
+\section{Repositorios Remotos}
+
+\begin{frame}{Conectar Local con Remoto}
+    \vspace{0.3cm}
+    
+    \textbf{Caso 1: Ya tienes un repo local}
+    
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        git remote add origin git@github.com:usuario/proyecto.git\\
+        git branch -M main\\
+        git push -u origin main
+    \end{codebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \textbf{Caso 2: Empezar desde cero}
+    
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        git clone git@github.com:usuario/proyecto.git\\
+        cd proyecto
+    \end{codebox}
+\end{frame}
+
+\begin{frame}{El Concepto de ``Origin''}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Definición]
+        \texttt{origin} es el nombre por defecto del repositorio remoto principal. Es solo un \highlight{alias}.
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \begin{codebox}[Ver remotos configurados]
+        \ttfamily\color{gludWhite}
+        git remote -v
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[Salida típica]
+        \ttfamily\small\color{gludWhite}
+        origin\ \ git@github.com:usuario/proyecto.git (fetch)\\
+        origin\ \ git@github.com:usuario/proyecto.git (push)
+    \end{codebox}
+    
+    \vspace{0.3cm}
+    
+    {\color{gludLightGray}\scriptsize Puedes tener múltiples remotos con diferentes nombres}
+\end{frame}
+
+\begin{frame}{Origin vs Upstream}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{darkbox}[origin]
+                {\color{gludWhite}
+                \textbf{Tu repositorio}
+                
+                \vspace{0.2cm}
+                
+                \begin{itemize}
+                    \item Tu fork o repo principal
+                    \item Donde haces push
+                    \item Tienes permisos de escritura
+                \end{itemize}
+                }
+            \end{darkbox}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \begin{darkbox}[upstream]
+                {\color{gludWhite}
+                \textbf{Repositorio original}
+                
+                \vspace{0.2cm}
+                
+                \begin{itemize}
+                    \item El proyecto original
+                    \item De donde haces fetch
+                    \item Solo lectura (normalmente)
+                \end{itemize}
+                }
+            \end{darkbox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \begin{codebox}[Agregar upstream]
+        \ttfamily\small\color{gludWhite}
+        git remote add upstream git@github.com:original/proyecto.git
+    \end{codebox}
+\end{frame}
+
+% ============================================================================
+% SECTION 5: COLABORADORES
+% ============================================================================
+
+\section{Gestión de Colaboradores}
+
+\begin{frame}{Roles en GitHub}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{\color{gludOrange} Repositorio Personal:}
+            \begin{itemize}
+                \item Owner (tú)
+                \item Collaborators (invitados)
+            \end{itemize}
+            
+            \vspace{0.3cm}
+            
+            {\scriptsize Solo dos niveles: dueño o colaborador con acceso completo}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \textbf{\color{gludOrange} Organización:}
+            \begin{itemize}
+                \item Owner
+                \item Admin
+                \item Maintainer
+                \item Write
+                \item Triage
+                \item Read
+            \end{itemize}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.4cm}
+    
+    {\color{gludLightGray}\scriptsize Para proyectos grandes, usar Organizaciones permite control granular}
+\end{frame}
+
+% ============================================================================
+% SECTION 6: CONFIGURACIÓN DEL REPOSITORIO
+% ============================================================================
+
+\section{Configuración del Repositorio}
+
+\begin{frame}{Settings Esenciales (GitHub)}
+    \vspace{0.3cm}
+    
+    \textbf{Repository → Settings:}
+    
+    \vspace{0.3cm}
+    
+    \begin{itemize}
+        \item \textbf{General:} Nombre, descripción, visibilidad
+        \item \textbf{Default branch:} Cambiar rama principal
+        \item \textbf{Features:} Wikis, Issues, Projects, Discussions
+        \item \textbf{Danger Zone:} Archivar, transferir, eliminar
+    \end{itemize}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \begin{orangebox}[Cambiar rama por defecto]
+        {\color{black}Settings → General → Default Branch → Cambiar de \texttt{master} a \texttt{main}}
+    \end{orangebox}
+\end{frame}
+
+\begin{frame}{Settings Esenciales (GitLab)}
+    \vspace{0.3cm}
+    
+    \textbf{Project → Settings → General:}
+    
+    \vspace{0.3cm}
+    
+    \begin{itemize}
+        \item \textbf{Naming:} Nombre y descripción
+        \item \textbf{Visibility:} Private, Internal, Public
+        \item \textbf{Advanced:} Transfer, archive, delete
+    \end{itemize}
+    
+    \vspace{0.3cm}
+    \pause
+    
+    \textbf{Project → Settings → Repository:}
+    
+    \begin{itemize}
+        \item \textbf{Default branch:} Rama principal
+        \item \textbf{Protected branches:} Reglas de protección
+        \item \textbf{Deploy keys:} Acceso automatizado
+    \end{itemize}
+\end{frame}
+
+% ============================================================================
+% SECTION 7: PROTECCIÓN DE RAMAS
+% ============================================================================
+
+\section{Protección de Ramas}
+
+\begin{frame}{¿Por Qué Proteger Ramas?}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[El Problema]
+        Sin protección, cualquiera puede hacer push directo a \texttt{main} y potencialmente romper producción.
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \textbf{Branch Protection Rules permiten:}
+    
+    \begin{itemize}
+        \item Prohibir push directo a main
+        \item Requerir aprobaciones antes de merge
+        \item Requerir que CI pase antes de merge
+        \item Prohibir force push
+        \item Requerir firma de commits
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Configurar Branch Protection}
+    \begin{codebox}[Branch name pattern]
+        \ttfamily\color{gludWhite}
+        main
+    \end{codebox}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Opciones recomendadas:}
+    \begin{itemize}
+        \item[$\checkmark$] Require a pull request before merging
+        \item[$\checkmark$] Require status checks to pass
+        \item[$\checkmark$] Do not allow bypassing the above settings
+        \item[$\checkmark$] Restrict who can push (opcional)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Ejemplo de Reglas por Rama}
+    \vspace{0.3cm}
+    
+    \centering
+    \small
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{|l|c|c|c|}
+        \hline
+        \rowcolor{gludOrange}
+        \textcolor{white}{\textbf{Rama}} & \textcolor{white}{\textbf{Push Directo}} & \textcolor{white}{\textbf{PR/MR}} & \textcolor{white}{\textbf{CI Requerido}} \\
+        \hline
+        \rowcolor{gludDarker}
+        main & No & Sí & Sí \\
+        \hline
+        \rowcolor{gludDark}
+        develop & Maintainers & Recomendado & Sí \\
+        \hline
+        \rowcolor{gludDarker}
+        feature/* & Developers & No & Opcional \\
+        \hline
+        \rowcolor{gludDark}
+        hotfix/* & Maintainers & Sí & Sí \\
+        \hline
+    \end{tabular}
+    
+    \vspace{0.4cm}
+    
+    {\color{gludLightGray}\scriptsize Esto implementa Git Flow a nivel de permisos del repositorio}
+\end{frame}
+
+% ============================================================================
+% SECTION 8: WEBHOOKS Y AUTOMATIZACIÓN
+% ============================================================================
+
+\section{Webhooks y Automatización}
+
+\begin{frame}{¿Qué son los Webhooks?}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Definición]
+        Un \highlight{webhook} es una notificación HTTP que GitHub/GitLab envía a un servidor externo cuando ocurre un evento.
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \textbf{Eventos comunes:}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{itemize}
+                \item Push a una rama
+                \item Creación de rama/tag
+                \item Pull Request creado
+                \item Comentarios
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{itemize}
+                \item Issues
+                \item Releases
+                \item Merge
+                \item Deployment
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Casos de Uso de Webhooks}
+    \vspace{0.3cm}
+    
+    \begin{itemize}
+        \item \textbf{CI/CD externo:} Trigger de Jenkins, CircleCI
+        \item \textbf{Notificaciones:} Slack, Discord, Teams
+        \item \textbf{Deployment:} Desplegar automáticamente al push
+        \item \textbf{Validaciones:} Verificar código, linting
+        \item \textbf{Integraciones:} Jira, Trello, Notion
+    \end{itemize}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \begin{orangebox}[Configuración]
+        {\color{black}Settings → Webhooks → Add webhook\\
+        Payload URL, Content type, Secret, Events}
+    \end{orangebox}
+\end{frame}
+
+\begin{frame}{Deploy Keys}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Definición]
+        Una \highlight{Deploy Key} es una clave SSH que da acceso a un solo repositorio (no a toda tu cuenta).
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \textbf{¿Cuándo usarla?}
+    
+    \begin{itemize}
+        \item Servidores de CI/CD
+        \item Scripts automatizados
+        \item Acceso de solo lectura para despliegues
+        \item Cuando no quieres usar tu clave personal
+    \end{itemize}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Configuración:} Settings → Deploy keys → Add deploy key
+\end{frame}
+
+\begin{frame}{Forks: Contribuir a Proyectos Ajenos}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Definición]
+        Un \highlight{fork} es una copia de un repositorio ajeno en tu cuenta, donde puedes hacer cambios libremente.
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \textbf{Flujo de contribución:}
+    
+    \begin{enumerate}
+        \item Fork del proyecto original
+        \item Clone de TU fork
+        \item Crear rama, hacer cambios, push
+        \item Abrir Pull Request hacia el original
+        \item Mantener sincronizado con upstream
+    \end{enumerate}
+    
+    \vspace{0.3cm}
+    
+    {\color{gludLightGray}\scriptsize Es la forma estándar de contribuir a proyectos open source}
+\end{frame}
+
+\begin{frame}{Sincronizar Fork con Upstream}
+    \vspace{0.3cm}
+    
+    \begin{codebox}[Configurar upstream (una vez)]
+        \ttfamily\small\color{gludWhite}
+        git remote add upstream git@github.com:original/proyecto.git
+    \end{codebox}
+    
+    \vspace{0.3cm}
+    \pause
+    
+    \begin{codebox}[Sincronizar con el original]
+        \ttfamily\small\color{gludWhite}
+        git fetch upstream\\
+        git switch main\\
+        git merge upstream/main\\
+        git push origin main
+    \end{codebox}
+    
+    \vspace{0.3cm}
+    \pause
+    
+    {\color{gludOrangeLight} GitHub también tiene botón ``Sync fork'' en la interfaz web}
+\end{frame}
+
+\begin{frame}{Próxima Clase: Code Review}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Clase 7]
+        {\color{black}Ya sabemos conectarnos y sincronizar. Ahora aprenderemos el \highlight{arte de revisar código ajeno}.}
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    
+    \textbf{En la Clase 7 aprenderemos:}
+    \begin{itemize}
+        \item Pull Requests / Merge Requests
+        \item El proceso de code review
+        \item Comentarios constructivos
+        \item Aprobaciones y cambios solicitados
+        \item Rol rotativo de Maintainer
+    \end{itemize}
+    
+    \vspace{0.4cm}
+    
+    \centering
+    {\color{gludOrangeLight} ¡Preparen sus repositorios con Branch Protection!}
+\end{frame}
+
+\quoteslide{Talk is cheap. Show me the code.}{Linus Torvalds}
+
+\thankslide{¡Gracias!\\[0.3cm]{\hspace*{1cm}\Large Ahora están conectados al mundo}}
+
+\end{document}
