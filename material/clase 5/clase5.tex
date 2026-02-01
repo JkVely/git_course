@@ -1,0 +1,1154 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+\usepackage{../theme}
+\usepackage{colortbl}
+
+% METADATA
+
+\title{Fusión y Conflictos}
+\subtitle{Merge, Rebase, Squash y el Arte de Sobrevivir}
+\author{GLUD --- Grupo GNU/Linux Universidad Distrital}
+\date{Control de Versiones y Desarrollo Colaborativo}
+
+% DOCUMENT
+
+\begin{document}
+
+% Portada
+\titleframe[Clase 5 · Fusión y Conflictos]
+
+\contentsframe
+
+% SECTION 1: INTRODUCCIÓN
+
+\section{El Momento de la Verdad}
+
+\begin{frame}{¿Por Qué Fusionar?}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[El Problema]
+        Después de trabajar en ramas separadas, eventualmente necesitas \highlight{integrar} esos cambios de vuelta.
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{Escenarios comunes:}
+            \begin{itemize}
+                \item Feature completada → merge a develop
+                \item Hotfix urgente → merge a main
+                \item Sincronizar tu rama con main
+                \item Integrar trabajo de otro developer
+            \end{itemize}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \textbf{El miedo real:}
+            \begin{itemize}
+                \item ¿Y si rompo todo?
+                \item ¿Qué son estos conflictos?
+                \item ¿Por qué Git me odia?
+                \item ¿Borro el repo y lo clono de nuevo?
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{La ``Solución'' del Principiante}
+    \vspace{0.5cm}
+    
+    \begin{center}
+        \begin{tikzpicture}
+            \node[text=gludWhite, font=\Large\bfseries] at (0,2) {Cuando hay un conflicto en Git...};
+            
+            \pause
+            
+            \node[rectangle, rounded corners, fill=gludOrange!30, text=black, font=\ttfamily\small, inner sep=15pt, text width=10cm, align=center] at (0,0) {
+                rm -rf mi-proyecto/\\
+                git clone https://github.com/equipo/proyecto.git\\
+                \# Copiar mis cambios manualmente...\\
+                \# Llorar un poco...\\
+                git add . \&\& git commit -m "cosas"
+            };
+            
+            \pause
+            
+            \node[text=gludOrangeLight, font=\large\itshape] at (0,-2) {``Si funciona, no es estúpido'' --- Mentira, sí lo es};
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\quoteslide{Merge conflicts are not bugs --- they are features that tell you two people cared enough to change the same thing.}{Sabiduría de Stack Overflow}
+
+\begin{frame}{Las Herramientas de Fusión}
+    \vspace{0.3cm}
+    
+    \textbf{Git ofrece varias formas de integrar cambios:}
+    
+    \vspace{0.4cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.32\textwidth}
+            \begin{darkbox}[git merge]
+                {\color{gludWhite}
+                \begin{itemize}
+                    \item Combina historiales
+                    \item Preserva contexto
+                    \item Crea commit de merge
+                    \item El más común
+                \end{itemize}
+                }
+            \end{darkbox}
+        \end{column}
+        \pause
+        \begin{column}{0.32\textwidth}
+            \begin{darkbox}[git rebase]
+                {\color{gludWhite}
+                \begin{itemize}
+                    \item Reescribe historial
+                    \item Historial lineal
+                    \item Más limpio
+                    \item Más peligroso
+                \end{itemize}
+                }
+            \end{darkbox}
+        \end{column}
+        \pause
+        \begin{column}{0.32\textwidth}
+            \begin{darkbox}[git squash]
+                {\color{gludWhite}
+                \begin{itemize}
+                    \item Combina commits
+                    \item Un solo commit
+                    \item Historial simple
+                    \item Pierde detalles
+                \end{itemize}
+                }
+            \end{darkbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% SECTION 2: GIT MERGE
+
+\section{Git Merge}
+
+\begin{frame}{¿Qué es git merge?}
+    \begin{orangebox}[Definición]
+        \texttt{git merge} combina el historial de dos ramas, integrando los cambios de una rama en otra.
+    \end{orangebox}
+    
+    \pause
+    
+    \begin{codebox}[Sintaxis básica]
+        \ttfamily\color{gludWhite}
+        git switch main\\
+        git merge feature/login
+    \end{codebox}
+    
+    {\color{gludLightGray} Esto trae los cambios de \texttt{feature/login} hacia \texttt{main}}
+
+    \pause
+    
+    \begin{alertbox}[Importante]
+        {\color{black}Siempre estás \textbf{trayendo} cambios \textbf{hacia} la rama en la que te encuentras.}
+    \end{alertbox}
+\end{frame}
+
+\begin{frame}{Tipos de Merge}
+    \vspace{0.3cm}
+    
+    Git decide automáticamente qué tipo de merge hacer:
+    
+    \vspace{0.4cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{darkbox}[Fast-Forward]
+                {\color{gludWhite}
+                \textbf{Cuándo ocurre:}\\
+                La rama base no tiene commits nuevos desde que se creó la feature.
+                
+                \vspace{0.3cm}
+                
+                \textbf{Resultado:}\\
+                Git simplemente ``avanza'' el puntero. No crea commit de merge.
+                }
+            \end{darkbox}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \begin{darkbox}[3-Way Merge (Recursive)]
+                {\color{gludWhite}
+                \textbf{Cuándo ocurre:}\\
+                Ambas ramas tienen commits nuevos (historiales divergentes).
+                
+                \vspace{0.3cm}
+                
+                \textbf{Resultado:}\\
+                Git crea un nuevo ``merge commit'' con dos padres.
+                }
+            \end{darkbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Fast-Forward Merge: Visualización}
+    \vspace{0.3cm}
+    
+    \begin{center}
+        \textbf{ANTES del merge:}
+        \vspace{0.3cm}
+        
+        \begin{tikzpicture}[
+            commit/.style={circle, fill=gludOrange, text=white, font=\tiny\bfseries, minimum size=0.5cm},
+            branch/.style={rectangle, rounded corners, fill=gludDarker, text=gludOrange, font=\tiny\ttfamily, inner sep=2pt},
+            arrow/.style={->, thick, gludOrangeLight}
+        ]
+            \node[commit] (c1) at (0,0) {C1};
+            \node[commit] (c2) at (1.5,0) {C2};
+            \node[commit] (c3) at (3,0) {C3};
+            \node[commit] (c4) at (4.5,0) {C4};
+            
+            \draw[arrow] (c1) -- (c2);
+            \draw[arrow] (c2) -- (c3);
+            \draw[arrow] (c3) -- (c4);
+            
+            \node[branch] at (1.5,-0.7) {main};
+            \node[branch] at (4.5,-0.7) {feature};
+        \end{tikzpicture}
+    \end{center}
+    
+    \pause
+    
+    \begin{center}
+        \textbf{DESPUÉS de \texttt{git merge feature}:}
+        \vspace{0.3cm}
+        
+        \begin{tikzpicture}[
+            commit/.style={circle, fill=gludOrange, text=white, font=\tiny\bfseries, minimum size=0.5cm},
+            branch/.style={rectangle, rounded corners, fill=gludDarker, text=gludOrange, font=\tiny\ttfamily, inner sep=2pt},
+            arrow/.style={->, thick, gludOrangeLight}
+        ]
+            \node[commit] (c1) at (0,0) {C1};
+            \node[commit] (c2) at (1.5,0) {C2};
+            \node[commit] (c3) at (3,0) {C3};
+            \node[commit] (c4) at (4.5,0) {C4};
+            
+            \draw[arrow] (c1) -- (c2);
+            \draw[arrow] (c2) -- (c3);
+            \draw[arrow] (c3) -- (c4);
+            
+            \node[branch] at (4.5,-0.7) {main, feature};
+        \end{tikzpicture}
+    \end{center}
+    
+    \vspace{0.3cm}
+    {\color{gludLightGray}\scriptsize main simplemente ``avanzó'' hasta donde estaba feature. No hay commit nuevo.}
+\end{frame}
+
+\begin{frame}{3-Way Merge: Visualización}
+    \vspace{0.2cm}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \centering
+            \textbf{ANTES del merge (historiales divergentes):}
+            \vspace{0.3cm}
+            
+            \begin{tikzpicture}[
+                commit/.style={circle, fill=gludOrange, text=white, font=\tiny\bfseries, minimum size=0.5cm},
+                branch/.style={rectangle, rounded corners, fill=gludDarker, text=gludOrange, font=\tiny\ttfamily, inner sep=2pt},
+                arrow/.style={->, thick, gludOrangeLight}
+            ]
+                \node[commit] (c1) at (0,0) {C1};
+                \node[commit] (c2) at (1.5,0) {C2};
+                \node[commit] (c3) at (3,1) {C3};
+                \node[commit] (c4) at (3,-1) {C4};
+                \node[commit] (c5) at (4.5,-1) {C5};
+                
+                \draw[arrow] (c1) -- (c2);
+                \draw[arrow] (c2) -- (c3);
+                \draw[arrow] (c2) -- (c4);
+                \draw[arrow] (c4) -- (c5);
+                
+                \node[branch] at (3,1.6) {main};
+                \node[branch] at (4.5,-1.6) {feature};
+            \end{tikzpicture}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \centering
+            \textbf{DESPUÉS de \texttt{git merge feature}:}
+            \vspace{0.3cm}
+            
+            \begin{tikzpicture}[
+                commit/.style={circle, fill=gludOrange, text=white, font=\tiny\bfseries, minimum size=0.5cm},
+                mergecommit/.style={circle, fill=gludPeach, text=gludDark, font=\tiny\bfseries, minimum size=0.5cm},
+                branch/.style={rectangle, rounded corners, fill=gludDarker, text=gludOrange, font=\tiny\ttfamily, inner sep=2pt},
+                arrow/.style={->, thick, gludOrangeLight}
+            ]
+                \node[commit] (c1) at (0,0) {C1};
+                \node[commit] (c2) at (1.5,0) {C2};
+                \node[commit] (c3) at (3,1) {C3};
+                \node[commit] (c4) at (3,-1) {C4};
+                \node[commit] (c5) at (4.5,-1) {C5};
+                \node[mergecommit] (m) at (5.5,0) {M};
+                
+                \draw[arrow] (c1) -- (c2);
+                \draw[arrow] (c2) -- (c3);
+                \draw[arrow] (c2) -- (c4);
+                \draw[arrow] (c4) -- (c5);
+                \draw[arrow] (c3) -- (m);
+                \draw[arrow] (c5) -- (m);
+                
+                \node[branch] at (5.5,0.7) {main};
+                \node[branch] at (4.5,-1.6) {feature};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.2cm}
+    {\color{gludLightGray}\scriptsize Git crea un ``merge commit'' (M) que tiene DOS padres: C3 y C5}
+\end{frame}
+
+\begin{frame}{Forzar el Tipo de Merge}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{codebox}[Forzar merge commit]
+                \ttfamily\small\color{gludWhite}
+                git merge -{-}no-ff feature
+            \end{codebox}
+            
+            \vspace{0.3cm}
+            
+            {\small\color{gludLightGray} Aunque sea posible fast-forward, crea un commit de merge. Útil para mantener registro de qué fue una feature.}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \begin{codebox}[Forzar fast-forward]
+                \ttfamily\small\color{gludWhite}
+                git merge -{-}ff-only feature
+            \end{codebox}
+            
+            \vspace{0.3cm}
+            
+            {\small\color{gludLightGray} Solo hace merge si es fast-forward. Falla si hay divergencia. Útil para scripts de CI.}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    \pause
+    
+    \begin{orangebox}[Recomendación]
+        {\color{black}En Git Flow, usa \texttt{-{-}no-ff} para features. Así puedes ver en el historial dónde empezó y terminó cada feature.}
+    \end{orangebox}
+\end{frame}
+
+\begin{frame}[fragile]{Ejemplo Práctico: Merge Exitoso}
+    \vspace{0.3cm}
+    
+    \begin{codebox}[Flujo completo de merge]
+        \ttfamily\small\color{gludWhite}
+        \# Asegurarse de estar en main actualizado\\
+        git switch main\\
+        git pull origin main\\
+        \\
+        \# Hacer el merge\\
+        git merge feature/login\\
+        \\
+        \# Si todo sale bien...\\
+        git push origin main\\
+        \\
+        \# Limpiar la rama\\
+        git branch -d feature/login
+    \end{codebox}
+    
+    \vspace{0.3cm}
+    
+    \begin{codebox}[Mensaje típico de éxito]
+        \ttfamily\tiny\color{gludWhite}
+        Merge made by the 'ort' strategy.\\
+        \ login.py | 45 +++++++++++++++++++++\\
+        \ 1 file changed, 45 insertions(+)
+    \end{codebox}
+\end{frame}
+
+% SECTION 3: GIT REBASE
+
+\section{Git Rebase}
+
+\begin{frame}{¿Qué es git rebase?}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Definición]
+        \texttt{git rebase} \highlight{reescribe} el historial de commits, moviendo tu rama a una nueva base (el tip de otra rama).
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{Concepto:}
+            \begin{itemize}
+                \item ``Re-basar'' = cambiar la base
+                \item Toma tus commits
+                \item Los ``replanta'' sobre otro punto
+                \item Crea nuevos commits (nuevos hashes)
+            \end{itemize}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \textbf{Resultado:}
+            \begin{itemize}
+                \item Historial lineal
+                \item Sin commits de merge
+                \item Más limpio visualmente
+                \item Pero... reescribe historial
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Rebase: Visualización}
+    \vspace{0.2cm}
+    
+    \begin{center}
+        \textbf{ANTES del rebase:}
+        \vspace{0.2cm}
+        
+        \begin{tikzpicture}[
+            commit/.style={circle, fill=gludOrange, text=white, font=\tiny\bfseries, minimum size=0.5cm},
+            branch/.style={rectangle, rounded corners, fill=gludDarker, text=gludOrange, font=\tiny\ttfamily, inner sep=2pt},
+            arrow/.style={->, thick, gludOrangeLight}
+        ]
+            \node[commit] (c1) at (0,0) {C1};
+            \node[commit] (c2) at (1.5,0) {C2};
+            \node[commit] (c3) at (3,0) {C3};
+            \node[commit] (c4) at (4.5,0) {C4};
+            \node[commit] (f1) at (3,1.5) {F1};
+            \node[commit] (f2) at (4.5,1.5) {F2};
+            
+            \draw[arrow] (c1) -- (c2);
+            \draw[arrow] (c2) -- (c3);
+            \draw[arrow] (c3) -- (c4);
+            \draw[arrow] (c2) -- (f1);
+            \draw[arrow] (f1) -- (f2);
+            
+            \node[branch] at (4.5,-0.7) {main};
+            \node[branch] at (4.5,2.2) {feature};
+        \end{tikzpicture}
+    \end{center}
+    
+    \pause
+    
+    \begin{center}
+        \textbf{DESPUÉS de \texttt{git rebase main} (estando en feature):}
+        \vspace{0.2cm}
+        
+        \begin{tikzpicture}[
+            commit/.style={circle, fill=gludOrange, text=white, font=\tiny\bfseries, minimum size=0.5cm},
+            newcommit/.style={circle, fill=gludPeach, text=gludDark, font=\tiny\bfseries, minimum size=0.5cm},
+            branch/.style={rectangle, rounded corners, fill=gludDarker, text=gludOrange, font=\tiny\ttfamily, inner sep=2pt},
+            arrow/.style={->, thick, gludOrangeLight}
+        ]
+            \node[commit] (c1) at (0,0) {C1};
+            \node[commit] (c2) at (1.5,0) {C2};
+            \node[commit] (c3) at (3,0) {C3};
+            \node[commit] (c4) at (4.5,0) {C4};
+            \node[newcommit] (f1) at (6,0) {F1'};
+            \node[newcommit] (f2) at (7.5,0) {F2'};
+            
+            \draw[arrow] (c1) -- (c2);
+            \draw[arrow] (c2) -- (c3);
+            \draw[arrow] (c3) -- (c4);
+            \draw[arrow] (c4) -- (f1);
+            \draw[arrow] (f1) -- (f2);
+            
+            \node[branch] at (4.5,-0.7) {main};
+            \node[branch] at (7.5,-0.7) {feature};
+        \end{tikzpicture}
+    \end{center}
+    
+    \vspace{0.2cm}
+    {\color{gludLightGray}\scriptsize Los commits F1 y F2 ahora son F1' y F2' --- ¡son commits NUEVOS con hashes diferentes!}
+\end{frame}
+
+\begin{frame}{Cuándo Usar Rebase}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{\color{gludOrange} Usar rebase:}
+            \begin{itemize}
+                \item Actualizar tu feature con cambios de main
+                \item Antes de crear un PR (historial limpio)
+                \item En ramas locales no compartidas
+                \item Para limpiar historial personal
+            \end{itemize}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \textbf{\color{gludOrange} NO usar rebase:}
+            \begin{itemize}
+                \item En ramas públicas/compartidas
+                \item Después de hacer push
+                \item En main o develop
+                \item Si no entiendes las consecuencias
+            \end{itemize}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    \pause
+    
+    \begin{alertbox}[La Regla de Oro del Rebase]
+        {\color{black}\textbf{NUNCA hagas rebase de commits que ya hayas pusheado.} Otros pueden tener esos commits y causarás un caos dimensional.}
+    \end{alertbox}
+\end{frame}
+
+\begin{frame}[fragile]{Ejemplo Práctico: Rebase}
+    \begin{codebox}[Actualizar feature con cambios de main]
+        \ttfamily\small\color{gludWhite}
+        \# Estás en tu feature, main tiene cambios nuevos\\
+        git switch feature/login\\
+        \\
+        \# Traer cambios de main\\
+        git fetch origin main\\
+        \\
+        \# Rebasar tu feature sobre main\\
+        git rebase origin/main\\
+        \\
+        \# Si hay conflictos, resolverlos y:\\
+        git rebase -{-}continue\\
+        \\
+        \# Si todo sale mal:\\
+        git rebase -{-}abort
+    \end{codebox}
+\end{frame}
+
+\quoteslide{Do not rebase commits that exist outside your repository and that people may have based work on.}{Pro Git Book}
+
+% SECTION 4: SQUASH
+
+\section{Squash: Aplastar Commits}
+
+\begin{frame}{¿Qué es Squash?}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Definición]
+        \texttt{squash} combina múltiples commits en uno solo, simplificando el historial.
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \textbf{¿Por qué aplastar commits?}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{Tu historial real:}
+            \begin{itemize}
+                \item ``WIP''
+                \item ``arreglo typo''
+                \item ``ahora sí''
+                \item ``por qué no funciona''
+                \item ``FUNCIONA!!!''
+                \item ``fix lint''
+            \end{itemize}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \textbf{Lo que quieres en main:}
+            \begin{itemize}
+                \item ``feat: implementar sistema de login con OAuth2''
+            \end{itemize}
+            
+            \vspace{0.5cm}
+            
+            {\color{gludOrangeLight} Un commit limpio y descriptivo}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Squash: Visualización}
+    \vspace{0.3cm}
+    
+    \begin{center}
+        \textbf{ANTES (6 commits):}
+        \vspace{0.3cm}
+        
+        \begin{tikzpicture}[
+            commit/.style={circle, fill=gludOrange, text=white, font=\tiny\bfseries, minimum size=0.5cm},
+            branch/.style={rectangle, rounded corners, fill=gludDarker, text=gludOrange, font=\tiny\ttfamily, inner sep=2pt},
+            arrow/.style={->, thick, gludOrangeLight}
+        ]
+            \node[commit] (c1) at (0,0) {C1};
+            \node[commit] (c2) at (1.2,0) {C2};
+            \node[commit] (c3) at (2.4,0) {C3};
+            \node[commit] (c4) at (3.6,0) {C4};
+            \node[commit] (c5) at (4.8,0) {C5};
+            \node[commit] (c6) at (6,0) {C6};
+            
+            \draw[arrow] (c1) -- (c2);
+            \draw[arrow] (c2) -- (c3);
+            \draw[arrow] (c3) -- (c4);
+            \draw[arrow] (c4) -- (c5);
+            \draw[arrow] (c5) -- (c6);
+            
+            \node[text=gludLightGray, font=\tiny] at (1.2,-0.7) {wip};
+            \node[text=gludLightGray, font=\tiny] at (2.4,-0.7) {typo};
+            \node[text=gludLightGray, font=\tiny] at (3.6,-0.7) {fix};
+            \node[text=gludLightGray, font=\tiny] at (4.8,-0.7) {wip};
+            \node[text=gludLightGray, font=\tiny] at (6,-0.7) {done};
+        \end{tikzpicture}
+    \end{center}
+    
+    \pause
+    
+    \begin{center}
+        \textbf{DESPUÉS del squash (1 commit):}
+        \vspace{0.3cm}
+        
+        \begin{tikzpicture}[
+            commit/.style={circle, fill=gludOrange, text=white, font=\tiny\bfseries, minimum size=0.5cm},
+            squashed/.style={circle, fill=gludPeach, text=gludDark, font=\tiny\bfseries, minimum size=0.7cm},
+            branch/.style={rectangle, rounded corners, fill=gludDarker, text=gludOrange, font=\tiny\ttfamily, inner sep=2pt},
+            arrow/.style={->, thick, gludOrangeLight}
+        ]
+            \node[commit] (c1) at (0,0) {C1};
+            \node[squashed] (s) at (2,0) {S};
+            
+            \draw[arrow] (c1) -- (s);
+            
+            \node[text=gludLightGray, font=\tiny, text width=3cm, align=center] at (2,-0.9) {feat: login con OAuth2};
+        \end{tikzpicture}
+    \end{center}
+    
+    \vspace{0.3cm}
+    {\color{gludLightGray}\scriptsize Todos los commits intermedios se combinan en uno solo con un mensaje limpio}
+\end{frame}
+
+\begin{frame}{Formas de Hacer Squash}    
+    \step{1}{Squash en merge (GitHub/GitLab)}
+    
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        \# En la interfaz web, botón "Squash and Merge"
+    \end{codebox}
+    
+    \pause
+    
+    \step{2}{Squash con rebase interactivo}
+    
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        git rebase -i HEAD\textasciitilde5  \# Últimos 5 commits
+    \end{codebox}
+    
+    \pause
+    
+    \step{3}{Merge con squash}
+    
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        git merge -{-}squash feature/login\\
+        git commit -m "feat: implementar login"
+    \end{codebox}
+\end{frame}
+
+\begin{frame}[fragile]{Rebase Interactivo: El Editor}
+    Al ejecutar \texttt{git rebase -i HEAD\textasciitilde5}, Git abre un editor:
+
+    \begin{codebox}[Editor de rebase interactivo]
+        \ttfamily\tiny\color{gludWhite}
+        pick a1b2c3d feat: inicio login\\
+        pick b2c3d4e wip\\
+        pick c3d4e5f arreglo typo\\
+        pick d4e5f6g ahora sí funciona\\
+        pick e5f6g7h fix lint\\
+        \\
+        \# Comandos:\\
+        \# p, pick = usar commit\\
+        \# s, squash = usar commit, pero fusionar con el anterior\\
+        \# f, fixup = como squash, pero descartar mensaje\\
+        \# d, drop = eliminar commit
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[Cambiar a:]
+        \ttfamily\tiny\color{gludWhite}
+        pick a1b2c3d feat: inicio login\\
+        squash b2c3d4e wip\\
+        squash c3d4e5f arreglo typo\\
+        squash d4e5f6g ahora sí funciona\\
+        squash e5f6g7h fix lint
+    \end{codebox}
+\end{frame}
+
+% SECTION 5: COMPARACIÓN
+
+\section{Merge vs Rebase vs Squash}
+
+\begin{frame}{Tabla Comparativa}
+    \vspace{0.3cm}
+    
+    \centering
+    \small
+    \renewcommand{\arraystretch}{1.4}
+    \begin{tabular}{|l|c|c|c|}
+        \hline
+        \rowcolor{gludOrange}
+        \textcolor{white}{\textbf{Aspecto}} & \textcolor{white}{\textbf{Merge}} & \textcolor{white}{\textbf{Rebase}} & \textcolor{white}{\textbf{Squash}} \\
+        \hline
+        \rowcolor{gludDarker}
+        Historial & Preservado & Reescrito & Simplificado \\
+        \hline
+        \rowcolor{gludDark}
+        Commits nuevos & Merge commit & Nuevos hashes & Un commit \\
+        \hline
+        \rowcolor{gludDarker}
+        Linealidad & Ramificado & Lineal & Lineal \\
+        \hline
+        \rowcolor{gludDark}
+        Conflictos & Una vez & Por cada commit & Una vez \\
+        \hline
+        \rowcolor{gludDarker}
+        Seguridad & Alto & Bajo & Medio \\
+        \hline
+        \rowcolor{gludDark}
+        Trazabilidad & Completa & Perdida & Perdida \\
+        \hline
+    \end{tabular}
+\end{frame}
+
+\begin{frame}{¿Cuál Usar?}
+    
+    \begin{columns}[T]
+        \begin{column}{0.32\textwidth}
+            \begin{darkbox}[Usa Merge]
+                {\color{gludWhite}
+                \begin{itemize}
+                    \item Ramas públicas
+                    \item Cuando la historia importa
+                    \item En main/develop
+                    \item Con -{-}no-ff en Git Flow
+                \end{itemize}
+                }
+            \end{darkbox}
+        \end{column}
+        \begin{column}{0.32\textwidth}
+            \begin{darkbox}[Usa Rebase]
+                {\color{gludWhite}
+                \begin{itemize}
+                    \item Ramas locales
+                    \item Antes de PR
+                    \item Para historial limpio
+                    \item Actualizar feature
+                \end{itemize}
+                }
+            \end{darkbox}
+        \end{column}
+        \begin{column}{0.32\textwidth}
+            \begin{darkbox}[Usa Squash]
+                {\color{gludWhite}
+                \begin{itemize}
+                    \item Features pequeñas
+                    \item Muchos commits WIP
+                    \item PR final a main
+                    \item Limpieza de historial
+                \end{itemize}
+                }
+            \end{darkbox}
+        \end{column}
+    \end{columns}
+    \pause
+    
+    \begin{orangebox}[Estrategia común de equipos]
+        {\color{black}\texttt{rebase} para actualizar feature branches + \texttt{squash merge} al fusionar PR = Historial lineal y limpio en main}
+    \end{orangebox}
+\end{frame}
+
+% SECTION 6: CONFLICTOS
+
+\section{Resolución de Conflictos}
+
+\begin{frame}{¿Qué es un Conflicto?}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Definición]
+        Un \highlight{conflicto} ocurre cuando Git no puede determinar automáticamente cómo combinar cambios en las mismas líneas de un archivo.
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \textbf{Git puede resolver automáticamente:}
+    \begin{itemize}
+        \item Cambios en archivos diferentes
+        \item Cambios en líneas diferentes del mismo archivo
+        \item Agregar contenido nuevo sin solapar
+    \end{itemize}
+    
+    \pause
+    
+    \textbf{Git NO puede resolver:}
+    \begin{itemize}
+        \item Cambios en las MISMAS líneas por diferentes personas
+        \item Eliminación de un archivo que otro modificó
+        \item Cambios que dependen lógicamente entre sí
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Anatomía de un Conflicto}
+    
+    \begin{codebox}[Así se ve un conflicto en el archivo]
+        \ttfamily\small\color{gludWhite}
+        def calcular\_precio(cantidad):\\
+        <<<<<<< HEAD\\
+        \hspace*{0.5cm}return cantidad * 100  \# Tu cambio\\
+        =======\\
+        \hspace*{0.5cm}return cantidad * 150  \# Cambio del otro\\
+        >>>>>>> feature/precios\\
+    \end{codebox}
+    \pause
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{Marcadores:}
+            \begin{itemize}
+                \item \texttt{<<<<<<< HEAD} --- Inicio de tu versión
+                \item \texttt{=======} --- Separador
+                \item \texttt{>>>>>>>} --- Fin de la otra versión
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \textbf{Tu trabajo:}
+            \begin{itemize}
+                \item Decidir qué versión conservar
+                \item O combinar ambas manualmente
+                \item Eliminar los marcadores
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Resolviendo el Conflicto}
+    \vspace{0.3cm}
+    
+    \step{1}{Identificar archivos con conflictos}
+    
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        git status {\small\color{gludLightGray}\# Muestra "both modified"}
+    \end{codebox}
+    
+    \pause
+    
+    \step{2}{Editar el archivo y elegir la solución}
+    
+    \begin{codebox}[Archivo resuelto]
+        \ttfamily\small\color{gludWhite}
+        def calcular\_precio(cantidad, premium=False):\\
+        \ \ \ \ precio\_base = 100\\
+        \ \ \ \ if premium:\\
+        \ \ \ \ \ \ \ \ return cantidad * 150\\
+        \ \ \ \ return cantidad * precio\_base
+    \end{codebox}
+\end{frame}
+
+\begin{frame}[fragile]{Resolviendo el Conflicto (cont.)}
+    \vspace{0.3cm}
+    
+    \step{3}{Marcar como resuelto y continuar}
+    
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        git add precio.py\\
+        git commit -m "fix: resolver conflicto de precios"
+    \end{codebox}
+\end{frame}
+
+\begin{frame}{Herramientas para Resolver Conflictos}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{darkbox}[VS Code]
+                {\color{gludWhite}
+                \begin{itemize}
+                    \item Vista de 3 paneles
+                    \item Botones: Accept Incoming/Current/Both
+                    \item Integración con GitLens
+                    \item ¡Lo más fácil!
+                \end{itemize}
+                }
+            \end{darkbox}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{darkbox}[Terminal]
+                {\color{gludWhite}
+                \begin{codebox}
+                    \ttfamily\tiny\color{gludWhite}
+                    \# Usar herramienta visual\\
+                    git mergetool\\
+                    \\
+                    \# Abortar merge\\
+                    git merge -{-}abort\\
+                    \\
+                    \# Ver versiones\\
+                    git checkout -{-}ours file\\
+                    git checkout -{-}theirs file
+                \end{codebox}
+                }
+            \end{darkbox}
+        \end{column}
+    \end{columns}
+    
+    \pause
+    
+    \begin{orangebox}[Consejo]
+        {\color{black}Configura VS Code como tu merge tool: \texttt{git config -{-}global merge.tool vscode}}
+    \end{orangebox}
+\end{frame}
+
+\begin{frame}{Ours vs Theirs}
+    
+    \begin{alertbox}[¡Cuidado!]
+        El significado cambia según la operación
+    \end{alertbox}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{darkbox}[Durante MERGE]
+                {\color{gludWhite}
+                \texttt{-{-}ours} = rama donde estás (main)\\
+                \texttt{-{-}theirs} = rama que fusionas (feature)
+                
+                \begin{codebox}
+                    \ttfamily\tiny\color{gludWhite}
+                    git switch main\\
+                    git merge feature\\
+                    \# ours = main\\
+                    \# theirs = feature
+                \end{codebox}
+                }
+            \end{darkbox}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \begin{darkbox}[Durante REBASE]
+                {\color{gludWhite}
+                \texttt{-{-}ours} = rama donde rebaseas (main)\\
+                \texttt{-{-}theirs} = tus commits (feature)
+                
+                \vspace{0.3cm}
+                
+                \begin{codebox}
+                    \ttfamily\tiny\color{gludWhite}
+                    git switch feature\\
+                    git rebase main\\
+                    \# ours = main (!)\\
+                    \# theirs = feature (!)
+                \end{codebox}
+                }
+            \end{darkbox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.3cm}
+    
+    {\color{gludLightGray}\scriptsize Sí, es confuso. En rebase, Git está ``replicando'' tus commits sobre main, así que main es ``ours'' temporalmente.}
+\end{frame}
+
+\begin{frame}{Tips de Supervivencia}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{\color{gludOrange} Antes del merge:}
+            \begin{itemize}
+                \item \texttt{git stash} si tienes cambios sin commit
+                \item \texttt{git pull} para tener todo actualizado
+                \item Revisar \texttt{git log} de ambas ramas
+                \item Hacer backup mental del estado
+            \end{itemize}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \textbf{\color{gludOrange} Durante el conflicto:}
+            \begin{itemize}
+                \item Mantener la calma
+                \item Resolver un archivo a la vez
+                \item Probar el código después
+                \item Pedir ayuda si es necesario
+            \end{itemize}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    \pause
+    
+    \begin{codebox}[Comandos de emergencia]
+        \ttfamily\small\color{gludWhite}
+        git merge -{-}abort\ \ \ \ \# Cancelar merge en progreso\\
+        git reset -{-}hard HEAD\ \# Deshacer TODO (peligroso)\\
+        git reflog\ \ \ \ \ \ \ \ \ \ \ \# Ver historial completo
+    \end{codebox}
+\end{frame}
+
+\begin{frame}{Lo que NO Debes Hacer}
+    \vspace{0.3cm}
+    
+    \begin{center}
+        \begin{tikzpicture}
+            \node[rectangle, rounded corners, fill=gludOrange!20, text=black, inner sep=15pt, text width=12cm] at (0,0) {
+                \textbf{\Large Las ``Soluciones'' que No Son Soluciones:}
+                
+                \vspace{0.3cm}
+                
+                \begin{itemize}
+                    {\color{black}
+                    \item[$\times$] Borrar el repositorio y clonarlo de nuevo
+                    \item[$\times$] Copiar los archivos a otra carpeta y empezar de cero
+                    \item[$\times$] Hacer \texttt{git checkout -{-}theirs .} sin revisar
+                    \item[$\times$] Editar el archivo remoto directamente en GitHub
+                    \item[$\times$] Crear una rama ``backup'' cada vez que hay conflicto
+                    \item[$\times$] Ignorar los marcadores de conflicto y hacer push
+                    }
+                \end{itemize}
+            };
+        \end{tikzpicture}
+    \end{center}
+    
+    \pause
+    
+    \vspace{0.3cm}
+    
+    {\color{gludLightGray}\centering\small Todos hemos hecho al menos una de estas... pero hoy aprendemos a hacerlo bien.}
+\end{frame}
+
+% SECTION 8: RESUMEN
+
+\section{Resumen y Próximos Pasos}
+
+\begin{frame}{Resumen de la Clase}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{\color{gludOrange} Conceptos clave:}
+            \begin{itemize}
+                \item \textbf{Merge:} Combina historiales, preserva contexto
+                \item \textbf{Rebase:} Reescribe historial, mantiene linealidad
+                \item \textbf{Squash:} Combina commits en uno
+                \item \textbf{Conflictos:} Git necesita tu ayuda
+            \end{itemize}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \textbf{\color{gludOrange} Reglas importantes:}
+            \begin{itemize}
+                \item Nunca rebase commits pusheados
+                \item Merge para ramas públicas
+                \item Resolver conflictos uno a uno
+                \item \texttt{git reflog} es tu amigo
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Comandos Clave}
+
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{darkbox}[Merge]
+                {\color{gludWhite}
+                \begin{codebox}
+                    \ttfamily\tiny\color{gludWhite}
+                    git merge feature\\
+                    git merge -{-}no-ff feature\\
+                    git merge -{-}squash feature\\
+                    git merge -{-}abort
+                \end{codebox}
+                }
+            \end{darkbox}
+            
+            \vspace{0.1cm}
+            
+            \begin{darkbox}[Rebase]
+                {\color{gludWhite}
+                \begin{codebox}
+                    \ttfamily\tiny\color{gludWhite}
+                    git rebase main\\
+                    git rebase -i HEAD\textasciitilde5\\
+                    git rebase -{-}continue\\
+                    git rebase -{-}abort
+                \end{codebox}
+                }
+            \end{darkbox}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{darkbox}[Conflictos]
+                {\color{gludWhite}
+                \begin{codebox}
+                    \ttfamily\tiny\color{gludWhite}
+                    git status\\
+                    git diff\\
+                    git add archivo\\
+                    git checkout -{-}ours file\\
+                    git checkout -{-}theirs file
+                \end{codebox}
+                }
+            \end{darkbox}
+            
+            
+            \begin{darkbox}[Emergencias]
+                {\color{gludWhite}
+                \begin{codebox}
+                    \ttfamily\tiny\color{gludWhite}
+                    git reflog\\
+                    git reset -{-}hard HASH\\
+                    git stash\\
+                    git stash pop
+                \end{codebox}
+                }
+            \end{darkbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Próxima Clase: Flujos Remotos}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Clase 6]
+        {\color{black}Hasta ahora hemos trabajado localmente. Es hora de conectar con el mundo exterior: \highlight{GitHub y GitLab}.}
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    
+    \textbf{En la Clase 6 aprenderemos:}
+    \begin{itemize}
+        \item Autenticación SSH (clave pública/privada)
+        \item Conceptos de \texttt{origin} y \texttt{upstream}
+        \item Forks y contribución a proyectos ajenos
+        \item Configurar repositorios remotos
+        \item Flujos de trabajo y gestion de ramas y repositorio
+    \end{itemize}
+    
+    \vspace{0.4cm}
+    
+    \centering
+    {\color{gludOrangeLight} ¡Preparen sus cuentas de GitHub/GitLab!}
+\end{frame}
+
+\quoteslide{The only way to learn Git is to use Git --- especially when things go wrong.}{Scott Chacon, Pro Git}
+
+\thankslide{¡Gracias!\\[0.3cm]{\hspace*{1cm}\Large Sobrevivieron al Laboratorio de Caos}}
+
+\end{document}
