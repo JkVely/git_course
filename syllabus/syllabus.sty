@@ -1,0 +1,214 @@
+% syllabus.sty -- Professional university syllabus package
+% Universidad Distrital Francisco José de Caldas
+\ProvidesPackage{syllabus}[2025/12/13 Professional Syllabus Package]
+
+% Dependencies
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[spanish]{babel}
+\RequirePackage{geometry}
+\RequirePackage{fancyhdr}
+\RequirePackage[table]{xcolor}
+\RequirePackage{titlesec}
+\RequirePackage{longtable}
+\RequirePackage{tabularx}
+\RequirePackage{array}
+\RequirePackage{enumitem}
+\RequirePackage{hyperref}
+\RequirePackage{graphicx}
+\RequirePackage{colortbl}
+\RequirePackage{multirow}
+\RequirePackage{amssymb}
+\RequirePackage{ragged2e} % provides \justifying
+\RequirePackage{tcolorbox}
+% Use widely-available font packages for portability
+\RequirePackage{mathptmx} % Times-like font (widely available)
+\RequirePackage{helvet}   % Helvetica-like (for headings)
+\RequirePackage[T1]{fontenc}
+\RequirePackage{microtype} % Better typography
+
+% Page geometry - márgenes amplios para mejor legibilidad
+\geometry{a4paper, left=28mm, right=28mm, top=32mm, bottom=28mm}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+% Professional color palette - elegante y moderno
+\definecolor{udBlue}{HTML}{1a3a52}      % Navy blue refinado
+\definecolor{udLightBlue}{HTML}{e8f2f7} % Light blue suave
+\definecolor{udAccent}{HTML}{2c5f7c}    % Accent blue
+\definecolor{udGray}{HTML}{5a6c7d}      % Soft gray
+\definecolor{udLightGray}{HTML}{f5f7f9} % Very light gray
+\definecolor{headerBg}{HTML}{fafbfc}    % Ultra light background
+\definecolor{accentGold}{HTML}{c9a961}  % Elegant gold
+\definecolor{borderColor}{HTML}{d1dce5} % Soft border
+
+% Header and footer - minimalista
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0.3pt}
+\fancyfoot[C]{\small\color{udGray}\sffamily\thepage}
+\fancyfoot[L]{\tiny\color{udGray!60}\sffamily Universidad Distrital}
+\fancyfoot[R]{\tiny\color{udGray!60}\sffamily Syllabus}
+
+% Section formatting - elegante, espaciado y moderno
+\titleformat{\section}
+  {\LARGE\bfseries\sffamily\color{udBlue}}
+  {}{0pt}{}
+  [\vspace{-6pt}{\color{accentGold}\titlerule[1.2pt]}\vspace{6pt}]
+\titleformat{\subsection}
+  {\large\bfseries\sffamily\color{udAccent}}
+  {}{0pt}{}
+  [\vspace{-4pt}{\color{borderColor}\titlerule[0.5pt]}\vspace{3pt}]
+\titlespacing*{\section}{0pt}{20pt}{12pt}
+\titlespacing*{\subsection}{0pt}{14pt}{8pt}
+
+% Storage macros
+\newcommand{\CourseTitle}{}
+\newcommand{\CourseCode}{}
+\newcommand{\Credits}{}
+\newcommand{\Semester}{}
+\newcommand{\Obligatory}{}
+\newcommand{\CourseCategory}{}
+\newcommand{\ElectiveType}{}
+\newcommand{\CourseTypeCheck}{}
+\newcommand{\MethodologyChecks}{}
+\newcommand{\Prerequisites}{}
+\newcommand{\Justification}{}
+
+% Setter commands
+\newcommand{\SetCourse}[3]{%
+  \renewcommand{\CourseTitle}{#1}%
+  \renewcommand{\CourseCode}{#2}%
+  \renewcommand{\Credits}{#3}%
+}
+\newcommand{\SetSemester}[1]{\renewcommand{\Semester}{#1}}
+\newcommand{\SetCourseType}[3]{%
+  \renewcommand{\Obligatory}{#1}%
+  \renewcommand{\CourseCategory}{#2}%
+  \renewcommand{\ElectiveType}{#3}%
+}
+\newcommand{\SetCourseTypeCheck}[1]{\renewcommand{\CourseTypeCheck}{#1}}
+\newcommand{\SetMethodologies}[1]{\renewcommand{\MethodologyChecks}{#1}}
+\newcommand{\SetPrerequisites}[1]{\renewcommand{\Prerequisites}{#1}}
+\newcommand{\SetJustification}[1]{\renewcommand{\Justification}{#1}}
+
+% Checkbox commands
+\newcommand{\checkbox}{$\square$}
+\newcommand{\checkedbox}{$\boxtimes$}
+
+% Official header with university info - diseño elegante y minimalista
+\newcommand{\PrintOfficialHeader}{%
+  \begin{center}
+    \begin{tcolorbox}[
+      width=\textwidth,
+      colback=white,
+      colframe=udBlue,
+      boxrule=1.5pt,
+      arc=3mm,
+      outer arc=3mm,
+      top=16pt,
+      bottom=16pt,
+      left=12pt,
+      right=12pt
+    ]
+      \centering
+      {\Large\sffamily\bfseries\color{udBlue} UNIVERSIDAD DISTRITAL FRANCISCO JOSÉ DE CALDAS}\\[6pt]
+      {\large\sffamily\color{udAccent} FACULTAD DE INGENIERÍA}\\[10pt]
+      {\Huge\sffamily\bfseries\color{udBlue} SYLLABUS}\\[8pt]
+    \end{tcolorbox}
+  \end{center}
+}
+
+% Course info table - diseño minimalista y elegante
+\newcommand{\PrintCourseInfo}{%
+  \begin{tcolorbox}[
+    width=\textwidth,
+    colback=udLightGray,
+    colframe=borderColor,
+    boxrule=0.5pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=10pt,
+    bottom=10pt
+  ]
+    \begin{tabularx}{\textwidth}{@{} >{\bfseries\sffamily\color{udAccent}}l X @{}}
+      	Espacio Académico: & \CourseTitle \\[6pt]
+      	Tipo de Curso: & \CourseTypeCheck \\[4pt]
+      	Alternativas Metodológicas: & \MethodologyChecks \\[4pt]
+      	Conocimientos Previos: & \Prerequisites \\
+    \end{tabularx}
+  \end{tcolorbox}
+}
+
+% Section box - diseño elegante con gradiente sutil
+\newcommand{\SectionBox}[2]{%
+  \vspace{12pt}
+  \begin{tcolorbox}[
+    colback=udLightBlue,
+    colframe=udBlue,
+    boxrule=1pt,
+    arc=2.5mm,
+    left=8pt,
+    right=8pt,
+    top=12pt,
+    bottom=12pt
+  ]
+    \centering{\LARGE\sffamily\bfseries\color{udBlue} #1}\\[8pt]
+    {\color{udGray} #2}
+  \end{tcolorbox}
+}
+
+% Content box - diseño minimalista y limpio
+\newcommand{\ContentBox}[2]{%
+  \vspace{10pt}
+  \begin{tcolorbox}[
+    colback=white,
+    colframe=borderColor,
+    boxrule=0.5pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=10pt,
+    bottom=10pt
+  ]
+    {\large\sffamily\bfseries\color{udAccent} #1}\\[8pt]
+    {\justifying\color{udGray} #2}
+  \end{tcolorbox}
+}
+
+% Weeks table - formato elegante, limpio y legible
+\newenvironment{WeeksTable}{%
+  \renewcommand{\arraystretch}{1.6}
+  \rowcolors{2}{udLightGray}{white}
+  \begin{longtable}{@{} >{\centering\bfseries}p{0.06\textwidth} p{0.44\textwidth} p{0.48\textwidth} @{}}
+  \rowcolor{udBlue}
+  \color{white}\sffamily\bfseries No. & \color{white}\sffamily\bfseries Tema a desarrollar & \color{white}\sffamily\bfseries Semanas académicas \\
+  \endhead
+}{%
+  \end{longtable}
+}
+
+% Evaluation table - diseño limpio y moderno
+\newenvironment{EvaluationTable}{%
+  \renewcommand{\arraystretch}{1.6}
+  \rowcolors{2}{udLightGray}{white}
+  \begin{tabularx}{\textwidth}{@{} >{\bfseries}l X >{\centering\arraybackslash}p{2.5cm} >{\centering\arraybackslash\bfseries}p{1.5cm} @{} }
+    \rowcolor{udBlue}
+    \color{white}\sffamily Tipo & \color{white}\sffamily Descripción & \color{white}\sffamily Fecha & \color{white}\sffamily \% \\
+}{%
+  \end{tabularx}
+}
+
+% Hyperref setup
+\AtBeginDocument{%
+  \hypersetup{
+    colorlinks=true,
+    linkcolor=udBlue,
+    urlcolor=udBlue,
+    bookmarksopen=true,
+    pdfborder={0 0 0}
+  }
+}
+
+\endinput

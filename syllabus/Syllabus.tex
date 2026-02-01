@@ -1,0 +1,255 @@
+\documentclass[12pt,letterpaper]{article}
+% Encoding and language (loaded before the style for maximum portability)
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{syllabus}
+
+% Configuración del curso
+\SetCourse{Ingeniería de Software Colaborativa: Git y CI/CD}{ISC-GIT-101}{0}
+\SetSemester{3 Semestre en adelante}
+\SetCourseType{
+Obligatorio \checkbox \hspace{5mm} Básico \checkbox \hspace{5mm} Complementario \checkedbox
+}{
+Electivo \checkedbox \hspace{5mm} Intrínseco \checkbox \hspace{5mm} Extrínseco \checkbox
+}{
+}
+\SetCourseTypeCheck{
+Teórico \checkbox \hspace{5mm} Práctico \checkbox \hspace{5mm} Teórico-Práctico \checkedbox
+}
+\SetMethodologies{
+Clase Magistral \checkedbox \hspace{3mm} Seminario \checkbox \hspace{3mm} Seminario-Taller \checkedbox \hspace{3mm} Taller \checkedbox \hspace{3mm} Prácticas \checkedbox \hspace{3mm} Proyecto \checkbox
+}
+\SetPrerequisites{Se requiere al menos conocimientos básicos de programación en cualquier lenguaje y una comprensión fundamental del trabajo colaborativo.}
+
+\SetJustification{
+\justifying
+En el plan de estudios actual de Ingeniería de Sistemas, los estudiantes adquieren sólidas bases de programación y diseño de software. Sin embargo, la industria tecnológica exige competencias adicionales que frecuentemente quedan fuera de las asignaturas tradicionales: \textbf{el trabajo colaborativo asíncrono, la gestión rigurosa de versiones de código y la automatización de procesos de desarrollo (DevOps)}.
+
+\medskip
+
+Este curso de extensión busca cerrar la brecha entre la ``programación académica'' (caracterizada por proyectos individuales o compartidos mediante archivos comprimidos) y la ``ingeniería de software profesional'', estandarizando el uso de \textbf{Git y GitHub/GitLab} como herramientas fundamentales para el éxito en materias avanzadas y en el ejercicio profesional.
+
+\medskip
+
+A través de una metodología basada en proyectos reales, los estudiantes experimentarán simulaciones de entornos laborales, adoptando roles técnicos rotativos y aplicando flujos de trabajo colaborativos estándar de la industria. El curso es \textbf{agnóstico del lenguaje de programación}: aunque se sugiere inicialmente \textbf{Java + Maven} (por facilidad de integración con workflows de CI/CD), los estudiantes pueden aplicar Git y CI/CD a cualquier stack tecnológico (Python, JavaScript, C++, etc.), garantizando compatibilidad multiplataforma (Linux, Windows y macOS).
+
+}
+
+\begin{document}
+
+% Encabezado oficial
+\PrintOfficialHeader
+
+% Información del curso
+\PrintCourseInfo
+
+% I. JUSTIFICACIÓN
+\SectionBox{I. JUSTIFICACIÓN DEL ESPACIO ACADÉMICO}{\Justification}
+
+% II. PROGRAMACIÓN DEL CONTENIDO
+\vspace{6pt}
+\SectionBox{II. PROGRAMACIÓN DEL CONTENIDO}{}
+
+\ContentBox{OBJETIVO GENERAL}{
+\justifying
+Capacitar al estudiante en herramientas profesionales de ingeniería de software colaborativa, desarrollando competencias para gestionar proyectos con Git, automatizar procesos de construcción y pruebas (CI/CD), y trabajar eficientemente en equipos de desarrollo siguiendo estándares de la industria, aplicables a cualquier stack tecnológico.
+}
+
+\ContentBox{OBJETIVOS ESPECÍFICOS}{
+\justifying
+\begin{enumerate}[leftmargin=5mm,itemsep=4pt,topsep=4pt]
+  \item Comprender la arquitectura distribuida de Git y su diferencia con sistemas centralizados.
+  \item Configurar entornos de desarrollo profesional multiplataforma (Linux, Windows, macOS) con Git y herramientas de construcción del lenguaje elegido.
+  \item Dominar el ciclo de vida del código: estados, staging, commits semánticos y gestión del historial.
+  \item Implementar estrategias de branching (Git Flow) y resolver conflictos de integración de manera efectiva.
+  \item Utilizar plataformas de hosting (GitHub/GitLab) para colaboración remota, code review y pull requests.
+  \item Aplicar roles rotativos en equipos (Tech Lead, Developer) para simular dinámicas laborales reales.
+  \item Automatizar procesos de construcción y pruebas mediante pipelines de CI/CD (GitHub Actions, GitLab CI).
+  \item Validar competencias mediante la entrega de un repositorio auditado con evidencia de trabajo colaborativo.
+\end{enumerate}
+}
+
+\ContentBox{COMPETENCIAS DE FORMACIÓN}{
+\justifying
+\noindent\textbf{\sffamily Competencias Técnicas:}\\
+Configuración y uso de herramientas de desarrollo profesional (Git, Maven, IDEs), gestión de repositorios distribuidos, automatización de procesos de construcción y despliegue mediante pipelines CI/CD, y depuración de conflictos de integración.
+
+\medskip
+
+\noindent\textbf{\sffamily Competencias Colaborativas:}\\
+Trabajo en equipos multidisciplinarios con roles definidos, comunicación técnica efectiva mediante issues y pull requests, revisión de código constructiva (code review), y adaptación a flujos de trabajo ágiles.
+
+\medskip
+
+\noindent\textbf{\sffamily Competencias Profesionales:}\\
+Esta formación contribuye al desarrollo de competencias en gestión de proyectos de software, aplicación de estándares de la industria (Conventional Commits, Semantic Versioning), uso de metodologías DevOps y preparación para entornos laborales tecnológicos modernos. El curso se enmarca en el dominio de ``herramientas de ingeniería de software'' del área de formación complementaria del proyecto curricular de Ingeniería de Sistemas.
+}
+
+\ContentBox{PROGRAMA SINTÉTICO}{
+\justifying
+\noindent\textbf{\sffamily Módulo 1: Fundamentos y Estandarización (Semanas 1--3)}
+\begin{enumerate}[leftmargin=5mm,itemsep=2pt,topsep=3pt]
+  \item Configuración del entorno de ingeniería: Git, entorno de desarrollo del lenguaje elegido (sugerencia inicial: Java + Maven), variables de entorno.
+  \item Arquitectura de Git: Local, Staging, Remote. Estados del archivo.
+  \item Ciclo de vida del código: Commits semánticos (Conventional Commits), \texttt{.gitignore} para el stack tecnológico usado.
+  \item Gestión del historial: \texttt{log}, \texttt{diff}, \texttt{restore}, \texttt{tags} para versionamiento.
+\end{enumerate}
+
+\medskip
+
+\noindent\textbf{\sffamily Módulo 2: Ramas y Estrategias de Colaboración (Semanas 4--6)}
+\begin{enumerate}[leftmargin=5mm,itemsep=2pt,topsep=3pt,resume]
+  \item Branching: Concepto de punteros, creación y gestión de ramas (\texttt{feature/*}, \texttt{develop}, \texttt{main}).
+  \item Merging y resolución de conflictos: Fast-Forward vs Recursive, laboratorio de fusión.
+  \item Trabajo remoto: Autenticación SSH, \texttt{origin} y \texttt{upstream}, clonación y sincronización.
+  \item Git Flow: Flujo de trabajo profesional con ramas \texttt{develop}, \texttt{release} y \texttt{hotfix}.
+\end{enumerate}
+
+\medskip
+
+\noindent\textbf{\sffamily Módulo 3: Calidad y Gestión de Proyectos (Semanas 7--8)}
+\begin{enumerate}[leftmargin=5mm,itemsep=2pt,topsep=3pt,resume]
+  \item Code Review: Pull Requests (PR), comentarios constructivos, aprobaciones de cambios.
+  \item Project Management: Issues, Labels, Milestones, tableros Kanban (GitHub/GitLab Projects).
+  \item Vinculación de commits con issues: Cierre automático mediante \texttt{Fixes \#N}, trazabilidad.
+\end{enumerate}
+
+\medskip
+
+\noindent\textbf{\sffamily Módulo 4: Automatización e Integración Continua (Semanas 9--10)}
+\begin{enumerate}[leftmargin=5mm,itemsep=2pt,topsep=3pt,resume]
+  \item Introducción a CI/CD: Concepto de pipeline, estructura YAML (\texttt{.github/workflows}, \texttt{.gitlab-ci.yml}).
+  \item Automatización de pruebas: Pipeline que ejecuta comandos de testing del stack elegido (ej. \texttt{mvn test}, \texttt{pytest}, \texttt{npm test}), bloqueo de PR si fallan tests.
+  \item Continuous Deployment: Generación de artifacts (ejecutables, paquetes), publicación en Releases mediante tags.
+\end{enumerate}
+}
+
+% III. ESTRATEGIAS
+\SectionBox{III. ESTRATEGIAS}{
+\justifying
+\noindent\textbf{Impartición y rol del GLUD:}
+\begin{itemize}[leftmargin=5mm,itemsep=4pt,topsep=4pt]
+  \item El curso será impartido por el Grupo de Trabajo GLUD como complemento a la formación curricular, aportando experiencia práctica, acompañamiento y recursos para la inserción en flujos colaborativos reales.
+\end{itemize}
+
+\medskip
+
+\noindent\textbf{Metodología: Aprendizaje Basado en Proyectos (ABP):}
+\begin{itemize}[leftmargin=5mm,itemsep=4pt,topsep=4pt]
+  \item El curso abandona el formato de clase magistral para adoptar una \textbf{simulación de entorno laboral}.
+  \item Los estudiantes trabajan en células de 3 personas (\textbf{tríos}) con roles rotativos semanales: \textit{Tech Lead} (revisa código y aprueba cambios) y \textit{Developers} (implementan features).
+  \item \textbf{Stack tecnológico flexible:} Git (consola), GitHub/GitLab + lenguaje de programación a elección del equipo. \textit{Sugerencia inicial: Java (JDK 17+) + Apache Maven} (facilita integración con workflows CI/CD mediante \texttt{mvn test}/\texttt{mvn package}).
+\end{itemize}
+
+\medskip
+
+\noindent\textbf{Sesiones teórico-prácticas:}
+\begin{itemize}[leftmargin=5mm,itemsep=4pt,topsep=4pt]
+  \item Cada sesión combina \textbf{exposición teórica breve} (15--20 min) + \textbf{ejecución en terminal} (60--70 min).
+  \item Los estudiantes replican comandos en tiempo real, resuelven ejercicios y trabajan en el proyecto colaborativo.
+  \item Se fomenta la resolución inmediata de dudas mediante sesiones interactivas y checkpoints con el GLUD.
+  \item Para sesiones de alta complejidad (ej. Laboratorio de Caos), se contará con \textbf{monitores del GLUD} para soporte técnico individualizado.
+\end{itemize}
+
+\medskip
+
+\noindent\textbf{Proyecto final iterativo:}
+\begin{itemize}[leftmargin=5mm,itemsep=4pt,topsep=4pt]
+  \item Desarrollo incremental en entregas parciales: repositorio inicial (Semana 3), demo intermedia (Semana 7), entrega final auditada (Semana 10).
+  \item Uso de flujos colaborativos reales: \texttt{feature branches}, \texttt{pull requests}, \texttt{code review}, pipelines CI/CD.
+  \item El GLUD facilita \textbf{plantillas base} para múltiples lenguajes: repositorio inicial con estructura de proyecto, \texttt{.gitignore} apropiado, plantilla de pipeline CI/CD y ejemplos de buenas prácticas. \textit{Stack recomendado para iniciar: Java + Maven}.
+\end{itemize}
+}
+
+% IV. RECURSOS BIBLIOGRÁFICOS
+\SectionBox{IV. RECURSOS BIBLIOGRÁFICOS}{
+\justifying
+\noindent\textbf{\sffamily Recursos en línea:}
+\begin{itemize}[leftmargin=5mm,itemsep=3pt,topsep=3pt]
+  \item Documentación oficial de Git: \url{https://git-scm.com/doc}
+  \item GitHub Learning Lab: \url{https://lab.github.com/}
+  \item Atlassian Git Tutorials: \url{https://www.atlassian.com/git/tutorials}
+  \item GitLab Documentation: \url{https://docs.gitlab.com/}
+  \item Interactive Git Branching: \url{https://learngitbranching.js.org/}
+\end{itemize}}
+
+% V. ORGANIZACIÓN / TIEMPOS
+\vspace{10pt}
+
+\noindent\textbf{\sffamily\large V. ORGANIZACIÓN / TIEMPOS}\\[6pt]
+\noindent\textbf{\sffamily Espacios, Tiempos, Agrupamientos:}\\
+\justifying
+El curso se organiza en \textbf{10 semanas (40 horas aproximadamente)} con sesiones teórico-prácticas. Los estudiantes trabajarán en células de 3 personas con roles rotativos semanales: \textit{Tech Lead} (revisa código y aprueba cambios) y \textit{Developers}. Se utilizarán GitHub/GitLab para colaboración asíncrona y Git Bash (Windows) o Terminal (Linux/macOS) para ejecución de comandos.
+
+\vspace{10pt}
+
+\begin{WeeksTable}
+1 & \textbf{Configuración del Entorno} & Instalación de Git y entorno del lenguaje elegido (sugerencia: Java JDK 17+ + Maven). Variables de entorno. Arquitectura de Git (Local, Staging, Remote). Primer \texttt{git init}. \\
+2 & \textbf{Ciclo de Vida del Código} & Estados del archivo (Untracked, Staged, Committed). Conventional Commits. Estructura de proyecto del stack elegido. Configuración de \texttt{.gitignore} apropiado (\texttt{gitignore.io}). \\
+3 & \textbf{Viajes en el Tiempo} & Historial (\texttt{log}), diferencias (\texttt{diff}), restauración (\texttt{checkout/restore}). Etiquetas (\texttt{tags}) para versiones. Crear versión \texttt{v0.1.0-alpha}. \\
+4 & \textbf{El Multiverso (Branching)} & Concepto de punteros y referencias. Ramas \texttt{feature/login} y \texttt{feature/inventario}. Por qué nunca trabajar directo en \texttt{main}. \\
+5 & \textbf{Fusión y Conflictos} & Merge (Fast-Forward vs Recursive). Rebase (concepto básico). \textbf{Laboratorio de Caos}: resolución guiada de conflictos en archivos del proyecto con apoyo de monitores GLUD. \\
+6 & \textbf{Flujos Remotos (GitHub/GitLab)} & Autenticación SSH (clave pública/privada). Conceptos de \texttt{origin} y \texttt{upstream}. Clonación de repositorios. Introducción a Git Flow (\texttt{develop}, \texttt{release}, \texttt{main}). \\
+7 & \textbf{Code Review y Pull Requests} & El arte de revisar código ajeno. Todo cambio requiere un PR aprobado. Comentarios constructivos. Rol de Maintainer rotativo. \\
+8 & \textbf{Project Management Integrado} & Issues, Labels, Milestones, tableros Kanban. Reportar bugs, crear Issues, vincular con commits (\texttt{Fixes \#12}). \\
+9 & \textbf{Introducción a CI (Integración Continua)} & ¿Qué es un Pipeline? Estructura YAML (\texttt{.gitlab-ci.yml}, \texttt{.github/workflows}). El GLUD proveerá \textit{plantillas base} para distintos lenguajes. Configurar y modificar pipeline para ejecutar tests del stack (ej. \texttt{mvn test}, \texttt{pytest}, \texttt{npm test}). Bloqueo de PR si fallan tests. \\
+10 & \textbf{Entrega Final y Despliegue} & Continuous Deployment (CD) básico. Pipeline que genera artifacts (ejecutables, paquetes) y publica en Releases al detectar tag \texttt{v1.0}. \textbf{Proyecto Final}: entrega de repositorio auditado. \\
+\end{WeeksTable}
+
+% VI. EVALUACIÓN
+\vspace{10pt}
+
+\SectionBox{VI. EVALUACIÓN Y CERTIFICACIÓN}{%
+\justifying
+\noindent\textbf{Modelo de Evaluación:} El curso \textbf{no contempla exámenes teóricos tradicionales}. La certificación se otorga bajo el modelo de \textbf{Validación de Competencias por Evidencia}, simulando las prácticas de evaluación en entornos profesionales de desarrollo de software.
+
+\medskip
+
+\noindent\textbf{Evidencia Principal: Repositorio Auditado}\\
+Cada grupo debe entregar la URL de su repositorio público en GitHub/GitLab al finalizar la semana 10. El repositorio será auditado por el equipo GLUD utilizando los siguientes criterios:
+
+\medskip
+
+\renewcommand{\arraystretch}{1.5}
+{
+\small
+\begin{tabularx}{0.9\textwidth}{@{}l X c @{}}
+\hline
+\rowcolor{udLightBlue}
+\sffamily\bfseries Criterio de Aprobación & \sffamily\bfseries Descripción & \sffamily\bfseries Peso \\
+\hline
+Historial de commits & Commits semánticos (Conventional Commits), mensajes claros, atomicidad. & 25\% \\
+Pull Requests documentados & Al menos 5 PRs con descripciones, revisiones de código y aprobaciones del Tech Lead. & 20\% \\
+Pipeline CI/CD funcional & Pipeline configurado y pasando en verde (Build Success). Debe ejecutar tests del stack automáticamente. & 20\% \\
+Proyecto compilable/ejecutable & El proyecto debe compilar/ejecutar correctamente con las herramientas del stack elegido (ej. \texttt{mvn package}, \texttt{python setup.py}, \texttt{npm build}) sin errores. & 15\% \\
+Issues y gestión de proyecto & Al menos 8 Issues creados, etiquetados y cerrados mediante commits vinculados (\texttt{Fixes \#N}). & 10\% \\
+Rotación de roles completada & Evidencia de que cada estudiante actuó como Tech Lead al menos una vez durante el proyecto (verificable mediante PRs aprobados). & 10\% \\
+\hline
+\multicolumn{2}{@{}l}{\sffamily\bfseries TOTAL} & \textbf{100\%} \\
+\hline
+\end{tabularx}
+}
+
+\medskip
+
+\noindent\textbf{Criterio de Aprobación:} Se requiere un mínimo de \textbf{70/100 puntos} para obtener el certificado.
+}
+
+\vspace{10pt}
+
+\SectionBox{COMPETENCIAS DESARROLLADAS}{%
+\begin{itemize}[leftmargin=5mm,itemsep=3pt,topsep=4pt]
+  \item Configuración y uso profesional de Git y herramientas de construcción/testing del stack elegido en entornos multiplataforma.
+  \item Dominio de flujos de trabajo colaborativos: branching, merging, resolución de conflictos.
+  \item Aplicación de Conventional Commits y Semantic Versioning.
+  \item Implementación de pipelines de CI/CD para automatización de pruebas y despliegues.
+  \item Gestión de proyectos mediante Issues, Labels, Milestones y tableros Kanban.
+  \item Trabajo en equipos con roles técnicos definidos (Tech Lead, Developer).
+  \item Revisión de código (code review) y aprobación de cambios mediante Pull Requests.
+  \item Uso de plataformas de hosting (GitHub/GitLab) para colaboración remota.
+  \item Integración de Git en flujos de trabajo ágiles y DevOps.
+  \item Capacidad de entregar proyectos de software con evidencia auditable de calidad.
+\end{itemize}}
+
+\end{document}
