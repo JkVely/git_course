@@ -15,7 +15,7 @@
 			<p>Programa oficial del curso con objetivos, competencias y criterios de evaluación.</p>
 		</td>
 		<td width="50%">
-			<h3>📘 <a href="Course.md">Descripción del Curso</a></h3>
+			<h3>📘 <a href="README.md">Descripción del Curso</a></h3>
 			<p>Visión general, filosofía y estructura del programa formativo.</p>
 		</td>
 	</tr>
