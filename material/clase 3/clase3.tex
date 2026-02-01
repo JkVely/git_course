@@ -1,0 +1,1020 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+\usepackage{../theme}
+
+% METADATA
+
+\title{Viajes en el Tiempo}
+\subtitle{Historial, Diferencias y Restauración}
+\author{GLUD --- Grupo GNU/Linux Universidad Distrital}
+\date{Control de Versiones y Desarrollo Colaborativo}
+
+% DOCUMENT
+
+\begin{document}
+
+% Portada
+\titleframe[Clase 3 · Viajes en el Tiempo]
+
+\contentsframe
+
+% SECTION 1: INTRODUCCIÓN
+
+\section{Introducción}
+
+\begin{frame}{¿Por qué Viajar en el Tiempo?}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[El poder de Git]
+        Git no solo guarda cambios, te permite \highlight{explorar el pasado}, \highlight{comparar versiones} y \highlight{recuperar estados anteriores}.
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{Escenarios comunes:}
+            \begin{itemize}
+                \item ¿Cuándo se introdujo este bug?
+                \item ¿Qué cambió entre versiones?
+                \item ¿Quién modificó esta línea?
+                \item Necesito volver a una versión estable
+            \end{itemize}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \textbf{Herramientas para navegar:}
+            \begin{itemize}
+                \item \texttt{git log} --- Ver historial
+                \item \texttt{git diff} --- Comparar cambios
+                \item \texttt{git restore} --- Recuperar archivos
+                \item \texttt{git tag} --- Marcar versiones
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\quoteslide{Git is a time machine for your code.}{GitHub Guides}
+
+% SECTION 2: HISTORIAL
+
+\section{Explorando el Historial}
+
+\begin{frame}{git log: Tu Máquina del Tiempo}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Definición]
+        \texttt{git log} muestra el historial completo de commits del repositorio.
+    \end{orangebox}
+    
+    \pause
+    
+    \begin{codebox}[Uso básico]
+        \ttfamily\color{gludWhite}
+        git log
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[Salida típica]
+        \ttfamily\tiny\color{gludWhite}
+        commit a3f5b2c8d1e4f6a7b8c9d0e1f2a3b4c5d6e7f8a9\\
+        Author: Tu Nombre <tu.email@ejemplo.com>\\
+        Date:   Mon Jan 6 10:30:00 2026 -0500\\
+        \\
+        \hspace{0.5cm}feat(auth): implementar login con JWT
+    \end{codebox}
+\end{frame}
+
+\begin{frame}{Formatos de git log}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{codebox}[Una línea por commit]
+                \ttfamily\small\color{gludWhite}
+                git log -{-}oneline
+            \end{codebox}
+            
+            \pause
+            
+            \begin{codebox}[Salida compacta]
+                \ttfamily\tiny\color{gludWhite}
+                a3f5b2c feat(auth): login JWT\\
+                f2a3b4c fix(api): error 500\\
+                c5d6e7f docs: actualizar README
+            \end{codebox}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \begin{codebox}[Con gráfico]
+                \ttfamily\small\color{gludWhite}
+                git log -{-}oneline -{-}graph
+            \end{codebox}
+            
+            \pause
+            
+            \begin{codebox}[Salida visual]
+                \ttfamily\tiny\color{gludWhite}
+                * a3f5b2c feat(auth): login\\
+                * f2a3b4c fix(api): error\\
+                * c5d6e7f docs: README\\
+                * b4c5d6e Initial commit
+            \end{codebox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    \pause
+    
+    \centering
+    {\color{gludOrangeLight} \texttt{-{-}oneline} es tu mejor aliado para visualizar rápidamente}
+\end{frame}
+
+\begin{frame}{Filtrar el Historial}    
+    \vspace{-0.25cm}
+    \step{1}{Últimos N commits}
+    \vspace{-0.25cm}
+    \begin{codebox}
+        \ttfamily\color{gludWhite}
+        git log -n 5 \hspace{1cm}\# Muestra últimos 5 commits
+    \end{codebox}
+    
+    \vspace{-0.25cm}
+    \pause
+    
+    \step{2}{Por autor}
+    \vspace{-0.25cm}
+    \begin{codebox}
+        \ttfamily\color{gludWhite}
+        git log -{-}author="Tu Nombre"
+    \end{codebox}
+    
+    \vspace{-0.25cm}
+    \pause
+    
+    \step{3}{Por fecha}
+    \vspace{-0.25cm}
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        git log -{-}since="2026-01-01" -{-}until="2026-01-06"
+    \end{codebox}
+    
+    \vspace{-0.25cm}
+    \pause
+    
+    \step{4}{Por mensaje}
+    \vspace{-0.25cm}
+    \begin{codebox}
+        \ttfamily\color{gludWhite}
+        git log -{-}grep="feat"
+    \end{codebox}
+\end{frame}
+
+\begin{frame}{git log Avanzado}
+    \begin{codebox}[Ver archivos modificados]
+        \ttfamily\small\color{gludWhite}
+        git log -{-}stat
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[Ver cambios completos]
+        \ttfamily\small\color{gludWhite}
+        git log -p
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[Formato personalizado]
+        \ttfamily\tiny\color{gludWhite}
+        git log -{-}pretty=format:"\%h - \%an, \%ar : \%s"
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[Salida]
+        \ttfamily\tiny\color{gludWhite}
+        a3f5b2c - Tu Nombre, 2 hours ago : feat(auth): implementar login\\
+        f2a3b4c - Tu Nombre, 1 day ago : fix(api): resolver error 500
+    \end{codebox}
+\end{frame}
+
+\begin{frame}{Buscar en el Historial}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[git log -S]
+        Busca commits que agregaron o eliminaron una cadena específica.
+    \end{orangebox}
+    
+    \pause
+    
+    \begin{codebox}[Buscar "calculateTotal"]
+        \ttfamily\small\color{gludWhite}
+        git log -S "calculateTotal"
+    \end{codebox}
+    
+    \vspace{0.3cm}
+    \pause
+    
+    \begin{codebox}[Ver cambios en archivo específico]
+        \ttfamily\small\color{gludWhite}
+        git log - - src/Main.java
+    \end{codebox}
+    
+    \vspace{0.3cm}
+\end{frame}
+
+% SECTION 3: DIFERENCIAS
+
+\section{Comparando Cambios}
+
+\begin{frame}{git diff: Comparar Versiones}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Recordatorio de Clase 1]
+        Ya vimos \texttt{git diff} básico. Ahora exploraremos usos avanzados.
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{codebox}[Working vs Staged]
+                \ttfamily\small\color{gludWhite}
+                git diff
+            \end{codebox}
+            
+            {\small\color{gludLightGray} Cambios no agregados}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \begin{codebox}[Staged vs Committed]
+                \ttfamily\small\color{gludWhite}
+                git diff -{-}staged
+            \end{codebox}
+            
+            {\small\color{gludLightGray} Cambios en staging}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Comparar entre Commits}
+    
+    \step{1}{Entre dos commits específicos}
+    
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        git diff a3f5b2c f2a3b4c
+    \end{codebox}
+    
+    \pause
+    
+    \step{2}{Commit actual vs anterior}
+    
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        git diff HEAD\textasciitilde{}1 HEAD
+    \end{codebox}
+    
+    \pause
+    
+    \step{3}{Últimos N commits}
+    
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        git diff HEAD\textasciitilde{}3 HEAD
+    \end{codebox}
+\end{frame}
+
+\begin{frame}{Referencias Relativas}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Definición]
+        Las \highlight{referencias relativas} permiten navegar el historial desde un punto.
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{Notación \textasciitilde{}}
+            \begin{itemize}
+                \item \texttt{HEAD\textasciitilde{}1} --- 1 commit atrás
+                \item \texttt{HEAD\textasciitilde{}2} --- 2 commits atrás
+                \item \texttt{HEAD\textasciitilde{}5} --- 5 commits atrás
+            \end{itemize}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \textbf{Notación \^{}}
+            \begin{itemize}
+                \item \texttt{HEAD\^{}} --- Padre directo
+                \item \texttt{HEAD\^{}\^{}} --- Abuelo
+                \item \texttt{HEAD\^{}2} --- Segundo padre (merge)
+            \end{itemize}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    \pause
+    
+    \centering
+    {\color{gludLightGray} Para linearidad simple, \texttt{\textasciitilde{}} es más claro}
+\end{frame}
+
+\begin{frame}{diff en Archivos Específicos}
+    \vspace{0.3cm}
+    
+    \begin{codebox}[Diferencias en un archivo]
+        \ttfamily\small\color{gludWhite}
+        git diff HEAD\textasciitilde{}1 HEAD -- src/Main.java
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[Salida típica]
+        \ttfamily\tiny\color{gludWhite}
+        diff --git a/src/Main.java b/src/Main.java\\
+        index a3f5b2c..f2a3b4c 100644\\
+        --- a/src/Main.java\\
+        +++ b/src/Main.java\\
+        @@ -10,7 +10,7 @@ public class Main \{\\
+        \hspace{0.5cm}public static void main(String[] args) \{\\
+        -\hspace{1cm}System.out.println("Hola Mundo");\\
+        +\hspace{1cm}System.out.println("Hola GLUD");\\
+        \hspace{0.5cm}\}
+    \end{codebox}
+    
+    \vspace{0.3cm}
+    \pause
+    
+    \centering
+    {\color{gludLightGray} \texttt{-} línea eliminada, \texttt{+} línea agregada}
+\end{frame}
+
+\begin{frame}{Herramientas Visuales para diff}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[git difftool]
+        Lanza una herramienta gráfica para visualizar diferencias.
+    \end{orangebox}
+    
+    \pause
+    
+    \begin{codebox}[Configurar difftool]
+        \ttfamily\small\color{gludWhite}
+        git config -{-}global diff.tool vimdiff\\
+        \# Alternativas: meld, kdiff3, vscode
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[Usar difftool]
+        \ttfamily\small\color{gludWhite}
+        git difftool HEAD\textasciitilde{}1 HEAD
+    \end{codebox}
+    \pause
+    
+    \centering
+    {\color{gludOrangeLight} Recomendado para cambios complejos con múltiples archivos}
+\end{frame}
+
+% SECTION 4: RESTAURACIÓN
+
+\section{Restaurar y Recuperar}
+
+\begin{frame}{git restore: Recuperar Archivos}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Definición]
+        \texttt{git restore} recupera archivos desde el staging o desde commits anteriores.
+    \end{orangebox}
+    
+    \pause
+    
+    \begin{codebox}[Descartar cambios en working directory]
+        \ttfamily\small\color{gludWhite}
+        git restore archivo.txt
+    \end{codebox}
+    
+    \pause
+    
+    \begin{alertbox}[Advertencia]
+        \textbf{¡Esto elimina tus cambios locales permanentemente!}
+    \end{alertbox}
+    
+    \vspace{0.3cm}
+    \pause
+    
+    \centering
+    {\color{gludLightGray} Úsalo solo cuando estés seguro de descartar cambios}
+\end{frame}
+
+\begin{frame}{Quitar Archivos del Staging}
+    \vspace{0.3cm}
+    
+    \begin{codebox}[Escenario]
+        \ttfamily\small\color{gludWhite}
+        git add archivo.txt\\
+        \# ¡Ups! No quería agregarlo todavía
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[Solución]
+        \ttfamily\small\color{gludWhite}
+        git restore -{-}staged archivo.txt
+    \end{codebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \begin{darkbox}[Resultado]
+        El archivo vuelve a Working Directory. Tus cambios \textbf{se mantienen}.
+    \end{darkbox}
+    
+    \vspace{0.3cm}
+    \pause
+    
+    \centering
+    {\color{gludOrangeLight} Útil para reorganizar qué va en cada commit}
+\end{frame}
+
+\begin{frame}{Restaurar desde Commit Específico}
+    \vspace{0.3cm}
+    
+    \begin{codebox}[Recuperar versión antigua]
+        \ttfamily\small\color{gludWhite}
+        git restore -{-}source=HEAD\textasciitilde{}3 archivo.txt
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[Con hash de commit]
+        \ttfamily\small\color{gludWhite}
+        git restore -{-}source=a3f5b2c archivo.txt
+    \end{codebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \begin{darkbox}[Uso típico]
+        Recuperar un archivo que funcionaba 3 commits atrás sin afectar otros archivos.
+    \end{darkbox}
+\end{frame}
+
+\begin{frame}{git checkout vs git restore}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Historia]
+        \texttt{git checkout} hacía muchas cosas. Git 2.23+ lo dividió en comandos especializados.
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{Forma antigua:}
+            \begin{codebox}
+                \ttfamily\tiny\color{gludWhite}
+                git checkout archivo.txt\\
+                git checkout -{-} archivo.txt\\
+                git checkout HEAD archivo.txt
+            \end{codebox}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \textbf{Forma moderna:}
+            \begin{codebox}
+                \ttfamily\tiny\color{gludWhite}
+                git restore archivo.txt\\
+                git restore archivo.txt\\
+                git restore -{-}source=HEAD archivo.txt
+            \end{codebox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    \pause
+    
+    \centering
+    {\color{gludLightGray} Usa \texttt{git restore}, es más claro y específico}
+\end{frame}
+
+\begin{frame}{Recuperar Archivos Eliminados}
+    \vspace{0.3cm}
+    
+    \begin{codebox}[Escenario: Eliminaste un archivo]
+        \ttfamily\small\color{gludWhite}
+        rm src/Config.java\\
+        git status \hspace{1cm}\# Muestra: deleted: src/Config.java
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[Recuperar desde último commit]
+        \ttfamily\small\color{gludWhite}
+        git restore src/Config.java
+    \end{codebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \begin{darkbox}[Resultado]
+        El archivo reaparece con el contenido del último commit.
+    \end{darkbox}
+\end{frame}
+
+% SECTION 5: ETIQUETAS
+
+\section{Etiquetas y Versiones}
+
+\begin{frame}{¿Qué son las Etiquetas (Tags)?}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Definición]
+        Un \highlight{tag} es un marcador permanente que apunta a un commit específico, típicamente usado para versiones.
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{Usos comunes:}
+            \begin{itemize}
+                \item Marcar releases (\texttt{v1.0.0})
+                \item Identificar versiones estables
+                \item Puntos de referencia importantes
+                \item Facilitar rollbacks
+            \end{itemize}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \textbf{Tipos de tags:}
+            \begin{itemize}
+                \item \textbf{Ligeros} --- Solo un puntero
+                \item \textbf{Anotados} --- Con metadata completa
+            \end{itemize}
+            
+            \vspace{0.3cm}
+            
+            {\color{gludOrangeLight} Usa tags anotados para releases}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Crear Tags}
+    \step{1}{Tag ligero}
+    
+    \begin{codebox}
+        \ttfamily\color{gludWhite}
+        git tag v0.1.0-alpha
+    \end{codebox}
+    
+    \pause
+    
+    \step{2}{Tag anotado (recomendado)}
+    
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        git tag -a v0.1.0-alpha -m "Primera versión alpha"
+    \end{codebox}
+    
+    \pause
+    
+    \step{3}{Tag en commit específico}
+    
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        git tag -a v0.0.9 a3f5b2c -m "Versión de prueba"
+    \end{codebox}
+\end{frame}
+
+\begin{frame}{Listar y Ver Tags}
+    \vspace{-0.25cm}
+    \begin{codebox}[Listar todos los tags]
+        \ttfamily\color{gludWhite}
+        git tag
+    \end{codebox}
+    
+    \pause
+    \begin{codebox}[Buscar tags por patrón]
+        \ttfamily\color{gludWhite}
+        git tag -l "v0.1.*"
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[Ver información de tag anotado]
+        \ttfamily\color{gludWhite}
+        git show v0.1.0-alpha
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[Salida]
+        \ttfamily\tiny\color{gludWhite}
+        tag v0.1.0-alpha\\
+        Tagger: Tu Nombre <tu.email@ejemplo.com>\\
+        Date:   Mon Jan 6 15:00:00 2026 -0500\\
+        \\
+        Primera versión alpha
+    \end{codebox}
+\end{frame}
+
+\begin{frame}{Versionamiento Semántico (SemVer)}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Formato]
+        \texttt{vMAYOR.MENOR.PARCHE-sufijo}
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \begin{columns}[T]
+        \begin{column}{0.32\textwidth}
+            \centering
+            \textbf{MAYOR}
+            
+            {\small Cambios incompatibles}
+            
+            \vspace{0.2cm}
+            
+            {\tiny \texttt{1.x.x} → \texttt{2.0.0}}
+        \end{column}
+        \begin{column}{0.32\textwidth}
+            \centering
+            \textbf{MENOR}
+            
+            {\small Nuevas funcionalidades}
+            
+            \vspace{0.2cm}
+            
+            {\tiny \texttt{1.2.x} → \texttt{1.3.0}}
+        \end{column}
+        \begin{column}{0.32\textwidth}
+            \centering
+            \textbf{PARCHE}
+            
+            {\small Correcciones de bugs}
+            
+            \vspace{0.2cm}
+            
+            {\tiny \texttt{1.2.3} → \texttt{1.2.4}}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    \pause
+    
+    \centering
+    
+    \textbf{Sufijos:} \texttt{-alpha}, \texttt{-beta}, \texttt{-rc1}, \texttt{-rc2}
+    
+    \vspace{0.2cm}
+    
+    {\color{gludLightGray} Ejemplos: \texttt{v0.1.0-alpha}, \texttt{v1.0.0-beta}, \texttt{v2.3.1}}
+\end{frame}
+
+\begin{frame}{Crear Versión v0.1.0-alpha}
+    \vspace{0.3cm}
+    
+    \begin{codebox}[Práctica guiada]
+        \ttfamily\small\color{gludWhite}
+        \# Asegúrate de estar en un estado limpio\\
+        git status\\
+        \\
+        \# Crea el tag anotado\\
+        git tag -a v0.1.0-alpha -m "Release: Primera versión alpha"\\
+        \\
+        \# Verifica\\
+        git tag\\
+        git show v0.1.0-alpha
+    \end{codebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \centering
+    {\color{gludOrangeLight} Este tag marca tu primer hito en el proyecto}
+\end{frame}
+
+\begin{frame}{Compartir Tags}
+    \vspace{0.3cm}
+    
+    \begin{alertbox}[Importante]
+        Por defecto, \texttt{git push} \textbf{NO} envía tags al remoto.
+    \end{alertbox}
+    
+    \pause
+    
+    \begin{codebox}[Enviar un tag específico]
+        \ttfamily\small\color{gludWhite}
+        git push origin v0.1.0-alpha
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[Enviar todos los tags]
+        \ttfamily\small\color{gludWhite}
+        git push origin -{-}tags
+    \end{codebox}
+
+    \pause
+    
+    \centering
+    {\color{gludLightGray} En GitHub/GitLab, los tags aparecen en la sección "Releases"}
+\end{frame}
+
+\begin{frame}{Eliminar Tags}
+    \vspace{0.3cm}
+    
+    \begin{codebox}[Eliminar tag local]
+        \ttfamily\color{gludWhite}
+        git tag -d v0.1.0-alpha
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[Eliminar tag remoto]
+        \ttfamily\small\color{gludWhite}
+        git push origin -{-}delete v0.1.0-alpha
+    \end{codebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \begin{alertbox}[Advertencia]
+        Ten cuidado al eliminar tags públicos. Otros pueden estar usándolos.
+    \end{alertbox}
+\end{frame}
+
+\begin{frame}{Navegar a un Tag}
+    \vspace{0.3cm}
+    
+    \begin{codebox}[Ver estado en un tag]
+        \ttfamily\small\color{gludWhite}
+        git checkout v0.1.0-alpha
+    \end{codebox}
+    
+    \pause
+    
+    \begin{alertbox}[Estado "detached HEAD"]
+        Estarás en modo lectura. Para trabajar, crea una rama desde el tag.
+    \end{alertbox}
+    
+    \pause
+    
+    \begin{codebox}[Crear rama desde tag]
+        \ttfamily\small\color{gludWhite}
+        git checkout -b bugfix-v0.1 v0.1.0-alpha
+    \end{codebox}
+    
+    \vspace{0.3cm}
+    \pause
+    
+    \centering
+    {\color{gludLightGray} Útil para crear hotfixes sobre versiones específicas}
+\end{frame}
+
+
+% SECTION 6: BUENAS PRÁCTICAS
+
+\section{Buenas Prácticas}
+
+\begin{frame}{Cuándo Usar Cada Comando}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{orangebox}[git log]
+                \begin{itemize}
+                    \item {\color{black}Revisar historial
+                    \item Buscar cuándo cambió algo
+                    \item Encontrar autor de cambios
+                    \item Auditar el proyecto}
+                \end{itemize}
+            \end{orangebox}
+            
+            
+            \begin{orangebox}[git diff]
+                \begin{itemize}
+                    \item {\color{black}Revisar antes de commit
+                    \item Comparar versiones
+                    \item Entender cambios ajenos}
+                \end{itemize}
+            \end{orangebox}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \begin{darkbox}[git restore]
+                \begin{itemize}
+                    \item Descartar cambios locales
+                    \item Quitar archivos de staging
+                    \item Recuperar archivos eliminados
+                    \item Probar código antiguo
+                \end{itemize}
+            \end{darkbox}
+            
+            \begin{darkbox}[git tag]
+                \begin{itemize}
+                    \item Marcar releases
+                    \item Identificar versiones estables
+                    \item Crear puntos de restauración
+                \end{itemize}
+            \end{darkbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Flujo de Trabajo Recomendado}
+    \vspace{0.3cm}
+    
+    \step{1}{Antes de cada commit}
+    
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        git status \hspace{1cm}\# ¿Qué cambió?\\
+        git diff \hspace{1.3cm}\# ¿Cómo cambió?\\
+        git add archivo \hspace{0.5cm}\# Agregar selectivamente
+    \end{codebox}
+    
+    \pause
+    
+    \step{2}{Después de varios commits}
+    
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        git log -{-}oneline \hspace{0.5cm}\# Revisar historial\\
+        git diff HEAD\textasciitilde{}5 HEAD \hspace{0.1cm}\# ¿Qué cambió en total?
+    \end{codebox}
+\end{frame}
+
+\begin{frame}{Flujo de Trabajo Recomendado}
+    \vspace{0.3cm}
+    
+    \step{3}{Al alcanzar un hito}
+    
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        git tag -a v0.1.0-alpha -m "Primera versión funcional"
+    \end{codebox}
+\end{frame}
+
+\begin{frame}{Errores Comunes}
+    \vspace{0.3cm}
+    
+    \begin{alertbox}[\ding{55} No hagas esto]
+        \begin{itemize}
+            \item {\color{black}Usar \texttt{git restore} sin verificar cambios
+            \item Eliminar tags públicos sin comunicar
+            \item Ignorar \texttt{git diff} antes de commit
+            \item Crear tags sin mensajes descriptivos
+            \item No usar versionamiento semántico}
+        \end{itemize}
+    \end{alertbox}
+    
+\end{frame}
+\begin{frame}{Errores Comunes}
+    \begin{darkbox}[\ding{51} Haz esto]
+        \begin{itemize}
+            \item Siempre revisa \texttt{git diff} antes de commit
+            \item Usa tags anotados para releases
+            \item Sigue SemVer consistentemente
+            \item Documenta cambios importantes en tags
+        \end{itemize}
+    \end{darkbox}
+\end{frame}
+
+\quoteslide{The best code is well-versioned code.}{GitHub Guides}
+
+% SECTION 7: RESUMEN
+
+\section{Resumen}
+
+\begin{frame}{Lo que Aprendimos}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{Historial y Navegación}
+            \begin{itemize}
+                \item \texttt{git log} y sus variantes
+                \item Filtros por autor, fecha, mensaje
+                \item Referencias relativas (\texttt{HEAD\textasciitilde{}N})
+                \item Buscar cambios específicos
+            \end{itemize}
+            
+            \vspace{0.4cm}
+            
+            \textbf{Comparación}
+            \begin{itemize}
+                \item \texttt{git diff} entre commits
+                \item Diferencias en archivos específicos
+                \item Herramientas visuales (difftool)
+            \end{itemize}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \textbf{Restauración}
+            \begin{itemize}
+                \item \texttt{git restore} para working directory
+                \item \texttt{git restore -{-}staged} para staging
+                \item Recuperar desde commits específicos
+                \item Diferencia con \texttt{git checkout}
+            \end{itemize}
+            
+            \vspace{0.4cm}
+            
+            \textbf{Versionamiento}
+            \begin{itemize}
+                \item Tags ligeros y anotados
+                \item Versionamiento semántico
+                \item Compartir y eliminar tags
+                \item Crear \texttt{v0.1.0-alpha}
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Comandos Clave}    
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        \# Historial\\
+        git log -{-}oneline -{-}graph\\
+        git log -{-}author="Nombre" -{-}since="2026-01-01"\\
+        \\
+        \# Diferencias\\
+        git diff HEAD\textasciitilde{}1 HEAD\\
+        git diff a3f5b2c f2a3b4c -{-} archivo.txt\\
+        \\
+        \# Restauración\\
+        git restore archivo.txt\\
+        git restore -{-}staged archivo.txt\\
+        \\
+        \# Tags\\
+        git tag -a v0.1.0-alpha -m "Primera versión"\\
+        git push origin -{-}tags
+    \end{codebox}
+\end{frame}
+
+\begin{frame}{Recursos}
+    \vspace{0.5cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{Git:}
+            \begin{itemize}
+                \item \url{https://git-scm.com/docs/git-log}
+                \item \url{https://git-scm.com/docs/git-diff}
+                \item \url{https://git-scm.com/docs/git-restore}
+                \item \url{https://git-scm.com/docs/git-tag}
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \textbf{Versionamiento:}
+            \begin{itemize}
+                \item \url{https://semver.org/}
+                \item Conventional Commits
+                \item Git Visualization Tools
+                \item GitHub Releases Guide
+            \end{itemize}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.8cm}
+    
+    \textbf{Práctica interactiva:}
+    \begin{itemize}
+        \item \url{https://learngitbranching.js.org/}
+        \item Git Immersion: \url{https://gitimmersion.com/}
+    \end{itemize}
+\end{frame}
+
+% Next class preview
+
+\begin{frame}[plain]
+\setbeamercolor{background canvas}{bg=gludPeach}
+\vspace{1.5cm}
+\centering
+
+{\Huge\color{gludOrange}\bfseries Próxima Clase}
+
+\vspace{0.5cm}
+
+{\Large\color{gludDark} El Multiverso: Branching}
+
+\vspace{1cm}
+
+{\large\color{gludWhite} Concepto de punteros y referencias. Ramas feature/* y hotfix/*. Por qué nunca trabajar directo en main.}
+\end{frame}
+
+% Despedida
+
+\thankslide{¡Gracias!\\[0.3cm]{\hspace*{1cm}\Large Nos vemos en la próxima clase}}
+
+\end{document}
