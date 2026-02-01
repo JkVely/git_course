@@ -1,0 +1,723 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+\usepackage{../theme}
+
+% METADATA
+
+\title{Configuración del Entorno}
+\subtitle{Git + Java + Maven en Linux}
+\author{GLUD --- Grupo GNU/Linux Universidad Distrital}
+\date{Control de Versiones y Desarrollo Colaborativo}
+
+% DOCUMENT
+
+\begin{document}
+
+% Portada
+\titleframe[Clase 1 · Primeros pasos]
+
+\contentsframe
+
+% SECTION 1: INTRODUCCIÓN
+
+\section{¿Por qué Git?}
+
+\begin{frame}{El valor de Git en tu flujo de trabajo}
+    \vspace{0.3cm}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{orangebox}[Sin Git]
+                \begin{itemize}
+                    \item<1-> {\color{black}Archivos duplicados sin control}
+                    \item<2-> {\color{black}Colaboración por USB o email}
+                    \item<3-> {\color{black}Miedo a experimentar}
+                    \item<4-> {\color{black}No hay registro de cambios}
+                \end{itemize}
+            \end{orangebox}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \begin{darkbox}[Con Git]
+                \begin{itemize}
+                    \item<2-> Historial completo y navegable
+                    \item<3-> Colaboración simultánea
+                    \item<4-> Ramas para experimentar
+                    \item<5-> Trazabilidad total
+                \end{itemize}
+            \end{darkbox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.8cm}
+    \pause
+    \centering
+    {\large\color{gludOrange} Hoy configuraremos todo lo necesario para trabajar profesionalmente}
+\end{frame}
+
+\quoteslide{The best time to start using version control was yesterday. The second best time is now.}{Desarrollador Anónimo}
+
+% SECTION 2: INSTALACIÓN DE GIT
+
+\section{Instalación de Git}
+
+\begin{frame}{Instalación en Linux}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{codebox}[Debian/Ubuntu]
+                \ttfamily\small\color{gludWhite}
+                sudo apt update\\
+                sudo apt install git -y
+            \end{codebox}
+            
+            \vspace{0.4cm}
+            
+            \begin{codebox}[Fedora/RHEL]
+                \ttfamily\small\color{gludWhite}
+                sudo dnf install git -y
+            \end{codebox}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \begin{codebox}[Arch Linux]
+                \ttfamily\small\color{gludWhite}
+                sudo pacman -Sy git
+            \end{codebox}
+            
+            \vspace{0.4cm}
+            
+            \begin{alertbox}[Verificación]
+                Después de instalar:
+                \begin{center}
+                    \ttfamily\color{gludDark}
+                    git -{}-version
+                \end{center}
+            \end{alertbox}
+        \end{column}
+    \end{columns}  
+\end{frame}
+
+\begin{frame}{Configuración Inicial de Git}
+    
+    \step{1}{Configura tu identidad (obligatorio)}
+    \vspace{-0.2cm}
+    \begin{codebox}
+        \ttfamily\color{gludWhite}
+        git config -{}-global user.name "Tu Nombre"\\
+        git config -{}-global user.email "tu.email@ejemplo.com"
+    \end{codebox}
+    
+    \pause
+    
+    \step{2}{Configura la rama por defecto}
+    \vspace{-0.2cm}
+    \begin{codebox}
+        \ttfamily\color{gludWhite}
+        git config -{}-global init.defaultBranch main
+    \end{codebox}
+    
+    \pause
+    
+    \step{3}{Configura tu editor preferido}
+    \vspace{-0.2cm}
+    \begin{codebox}
+        \ttfamily\color{gludWhite}
+        git config -{}-global core.editor nano\\
+        \# Alternativas: vim, emacs, code -{}-wait
+    \end{codebox}
+\end{frame}
+
+\begin{frame}{Verificar Configuración}
+    \vspace{0.3cm}
+    
+    \begin{codebox}[Ver toda la configuración]
+        \ttfamily\color{gludWhite}
+        git config -{}-list -{}-global
+    \end{codebox}
+    
+    \vspace{0.5cm}
+    \pause
+    
+    \begin{codebox}[Salida esperada]
+        \ttfamily\small\color{gludWhite}
+        user.name=Tu Nombre\\
+        user.email=tu.email@ejemplo.com\\
+        init.defaultbranch=main\\
+        core.editor=nano
+    \end{codebox}
+\end{frame}
+
+% SECTION 3: INSTALACIÓN JDK Y MAVEN
+
+\section{Java y Maven}
+
+\begin{frame}{Instalación de JDK 21 y Maven}
+    \vspace{0.3cm}
+    
+    \begin{codebox}[Debian/Ubuntu]
+        \ttfamily\small\color{gludWhite}
+        sudo apt update\\
+        sudo apt install openjdk-21-jdk maven -y
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[Fedora/RHEL]
+        \ttfamily\small\color{gludWhite}
+        sudo dnf install java-21-openjdk-devel maven -y
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[Verificación]
+        \ttfamily\small\color{gludWhite}
+        java -version\\
+        mvn -v
+    \end{codebox}
+    
+    \vspace{0.3cm}
+    \pause
+    
+    \centering
+    {\color{gludLightGray} Deberías ver Java 21+ y Maven 3.X}
+\end{frame}
+
+\begin{frame}{Variables de Entorno}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[¿Qué son?]
+        Las \highlight{variables de entorno} son valores que el sistema operativo utiliza para configurar el comportamiento de programas y scripts.
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{JAVA\_HOME}
+            
+            \vspace{0.2cm}
+            
+            Apunta a la instalación de Java
+            
+            \begin{codebox}
+                \ttfamily\tiny\color{gludWhite}
+                /usr/lib/jvm/\\
+                \hspace{0.5cm}java-21-openjdk
+            \end{codebox}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \textbf{PATH}
+            
+            \vspace{0.2cm}
+            
+            Directorios donde buscar ejecutables
+            
+            \begin{codebox}
+                \ttfamily\tiny\color{gludWhite}
+                \$JAVA\_HOME/bin:\\
+                /usr/local/bin:\\
+                /usr/bin
+            \end{codebox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Configurar Variables de Entorno}
+    
+    \step{1}{Edita tu archivo de configuración de shell}
+    \vspace{-0.2cm}
+    \begin{codebox}
+        \ttfamily\color{gludWhite}
+        nano \textasciitilde/.bashrc \hspace{1cm}\# o \textasciitilde/.zshrc
+    \end{codebox}
+    
+    \pause
+    
+    \step{2}{Agrega al final del archivo}
+    \vspace{-0.2cm}
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        export JAVA\_HOME=/usr/lib/jvm/java-21-openjdk\\
+        export PATH="\$JAVA\_HOME/bin:\$PATH"
+    \end{codebox}
+    
+    \pause
+    
+    \step{3}{Recarga la configuración}
+    \vspace{-0.2cm}
+    \begin{codebox}
+        \ttfamily\color{gludWhite}
+        source \textasciitilde/.bashrc
+    \end{codebox}
+\end{frame}
+
+% SECTION 4: ARQUITECTURA DE GIT
+
+\section{Arquitectura de Git}
+
+\begin{frame}{Las Cuatro Áreas de Git}
+    \vspace{0.3cm}
+    \centering
+    
+    \begin{tikzpicture}[scale=0.85]
+        % Working Directory
+        \fill[gludPeach] (0,0) rectangle (3,2);
+        \node[text=gludDark,font=\bfseries\small] at (1.5,1.5) {Working};
+        \node[text=gludDark,font=\bfseries\small] at (1.5,1) {Directory};
+        \node[text=gludGray,font=\tiny] at (1.5,0.3) {Archivos editables};
+        
+        \pause
+        
+        % Arrow 1
+        \draw[->,thick,gludOrange] (3.2,1) -- (4,1);
+        \node[text=gludWhite,font=\tiny] at (3.6,1.4) {git add};
+        
+        % Staging Area
+        \fill[gludOrange] (4.2,0) rectangle (7.2,2);
+        \node[text=gludWhite,font=\bfseries\small] at (5.7,1.5) {Staging};
+        \node[text=gludWhite,font=\bfseries\small] at (5.7,1) {Area};
+        \node[text=gludPeach,font=\tiny] at (5.7,0.3) {Preparados};
+        
+        \pause
+        
+        % Arrow 2
+        \draw[->,thick,gludOrange] (7.4,1) -- (8.2,1);
+        \node[text=gludWhite,font=\tiny] at (7.8,1.4) {git commit};
+        
+        % Local Repository
+        \fill[gludDarker] (8.4,0) rectangle (11.4,2);
+        \draw[gludOrange,thick] (8.4,0) rectangle (11.4,2);
+        \node[text=gludWhite,font=\bfseries\small] at (9.9,1.5) {Local};
+        \node[text=gludWhite,font=\bfseries\small] at (9.9,1) {Repository};
+        \node[text=gludLightGray,font=\tiny] at (9.9,0.3) {Historial local};
+        
+        \pause
+        
+        % Arrow 3
+        \draw[->,thick,gludOrange] (11.6,1) -- (12.4,1);
+        \node[text=gludWhite,font=\tiny] at (12,1.4) {git push};
+        
+        % Remote Repository
+        \fill[gludOrangeDark] (12.6,0) rectangle (15.6,2);
+        \node[text=gludWhite,font=\bfseries\small] at (14.1,1.5) {Remote};
+        \node[text=gludWhite,font=\bfseries\small] at (14.1,1) {Repository};
+        \node[text=gludPeach,font=\tiny] at (14.1,0.3) {GitHub/GitLab};
+    \end{tikzpicture}
+    
+    \vspace{0.6cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.23\textwidth}
+            \centering
+            \circled{1} \highlight{Working}
+            
+            \vspace{0.1cm}
+            {\tiny Modificas archivos}
+        \end{column}
+        \begin{column}{0.23\textwidth}
+            \centering
+            \circled{2} \highlight{Staging}
+            
+            \vspace{0.1cm}
+            {\tiny Seleccionas cambios}
+        \end{column}
+        \begin{column}{0.23\textwidth}
+            \centering
+            \circled{3} \highlight{Local Repo}
+            
+            \vspace{0.1cm}
+            {\tiny Guardas commits}
+        \end{column}
+        \begin{column}{0.23\textwidth}
+            \centering
+            \circled{4} \highlight{Remote}
+            
+            \vspace{0.1cm}
+            {\tiny Sincronizas}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Working Directory}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Definición]
+        El \highlight{Working Directory} es tu carpeta de trabajo donde modificas archivos libremente.
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{Características:}
+            \begin{itemize}
+                \item Archivos sin rastrear
+                \item Archivos modificados
+                \item Puedes editar libremente
+            \end{itemize}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \begin{codebox}[Ver estado]
+                \ttfamily\small\color{gludWhite}
+                git status
+            \end{codebox}
+            
+            \vspace{0.3cm}
+            
+            {\small\color{gludLightGray} Muestra archivos modificados y sin rastrear}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Staging Area (Index)}
+    \vspace{0.1cm}
+    
+    \begin{orangebox}[Definición]
+        El \highlight{Staging Area} es donde preparas exactamente qué cambios quieres guardar en el próximo commit.
+    \end{orangebox}
+    
+    \vspace{0.2cm}
+    \pause
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{codebox}[Agregar archivos]
+                \ttfamily\small\color{gludWhite}
+                git add archivo.txt\\[4pt]
+                git add src/\\[4pt]
+                git add .
+            \end{codebox}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \begin{codebox}[Agregar selectivamente]
+                \ttfamily\small\color{gludWhite}
+                git add -p archivo.txt
+            \end{codebox}
+            
+            \vspace{0.3cm}
+            
+            {\small\color{gludLightGray} Te permite elegir qué partes agregar}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    \pause
+    
+    \centering
+    {\color{gludOrangeLight} El staging permite commits \textbf{atómicos} y bien organizados}
+\end{frame}
+
+\begin{frame}{Comparando Cambios}
+    
+    \step{1}{Ver cambios en Working Directory}
+    \vspace{-0.2cm}
+    \begin{codebox}
+        \ttfamily\color{gludWhite}
+        git diff
+    \end{codebox}
+    
+    \pause
+    
+    \step{2}{Ver cambios en Staging}
+    \vspace{-0.2cm}
+    \begin{codebox}
+        \ttfamily\color{gludWhite}
+        git diff -{}-staged
+    \end{codebox}
+    
+    \pause
+    
+    \step{3}{Ver cambios entre commits}
+    \vspace{-0.2cm}
+    \begin{codebox}
+        \ttfamily\color{gludWhite}
+        git diff HEAD\textasciitilde{}1 HEAD
+    \end{codebox}
+    
+    \pause
+    
+    \centering
+    {\color{gludLightGray} \texttt{git diff} es tu mejor amigo para revisar cambios}
+\end{frame}
+
+\begin{frame}{Local Repository}
+    \vspace{0.1cm}
+    
+    \begin{orangebox}[Definición]
+        El \highlight{Local Repository} almacena el historial completo de commits en tu máquina.
+    \end{orangebox}
+
+    \pause
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{codebox}[Crear commit]
+                \ttfamily\small\color{gludWhite}
+                git commit -m "mensaje"
+            \end{codebox}
+            
+            \vspace{0.1cm}
+            
+            \begin{codebox}[Ver historial]
+                \ttfamily\small\color{gludWhite}
+                git log -{}-oneline\\
+                git log -{}-graph -{}-all
+            \end{codebox}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \begin{codebox}[Ver un commit]
+                \ttfamily\small\color{gludWhite}
+                git show <hash>
+            \end{codebox}
+            
+            \vspace{0.1cm}
+            
+            \begin{alertbox}[Tip]
+                Escribe mensajes descriptivos y claros
+            \end{alertbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Remote Repository}
+    \vspace{-0.2cm}
+    \begin{orangebox}[Definición]
+        Es una copia de tu repositorio alojada en un servidor (GitHub, GitLab, etc.).
+    \end{orangebox}
+    
+    \pause
+    
+    \begin{codebox}[Conectar con remoto]
+        \ttfamily\small\color{gludWhite}
+        git remote add origin https://github.com/usuario/repo.git
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[Enviar cambios]
+        \ttfamily\small\color{gludWhite}
+        git push -u origin main
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[Clonar repositorio]
+        \ttfamily\small\color{gludWhite}
+        git clone https://github.com/usuario/repo.git
+    \end{codebox}
+\end{frame}
+
+% SECTION 5: PRÁCTICA GUIADA
+
+\section{Práctica Guiada}
+
+\begin{frame}{Creando tu Primer Repositorio}
+    \vspace{0.3cm}
+    
+    \step{1}{Crear directorio y entrar}
+    
+    \begin{codebox}
+        \ttfamily\color{gludWhite}
+        mkdir mi-primer-repo \&\& cd mi-primer-repo
+    \end{codebox}
+    
+    \pause
+    
+    \step{2}{Inicializar Git}
+    
+    \begin{codebox}
+        \ttfamily\color{gludWhite}
+        git init
+    \end{codebox}
+    
+    \pause
+    
+    \begin{alertbox}[Resultado]
+        Se crea una carpeta oculta \texttt{.git/} que contiene toda la información del repositorio.
+    \end{alertbox}
+\end{frame}
+
+\begin{frame}{Primer Commit}
+
+    \step{3}{Crear archivo README}
+    
+    \begin{codebox}
+        \ttfamily\color{gludWhite}
+        echo "\# Mi Primer Repositorio" > README.md
+    \end{codebox}
+    
+    \pause
+    
+    \step{4}{Agregar al staging}
+    
+    \begin{codebox}
+        \ttfamily\color{gludWhite}
+        git add README.md
+    \end{codebox}
+    
+    \pause
+    
+    \step{5}{Crear commit}
+    
+    \begin{codebox}
+        \ttfamily\color{gludWhite}
+        git commit -m "feat: agregar README inicial"
+    \end{codebox}
+\end{frame}
+
+\begin{frame}{Gitignore: Ignorar Archivos}
+    
+    \begin{orangebox}[¿Qué es .gitignore?]
+        Archivo que especifica qué archivos NO deben ser rastreados por Git.
+    \end{orangebox}
+
+    \pause
+    
+    \begin{codebox}[Crear .gitignore para Java/Maven]
+        \ttfamily\small\color{gludWhite}
+        target/\\
+        *.class\\
+        .idea/\\
+        .vscode/\\
+        *.log
+    \end{codebox}
+
+    \centering
+    {\color{gludLightGray} Siempre crea .gitignore al inicio del proyecto}
+\end{frame}
+
+
+\begin{frame}{Flujo Completo de Trabajo}
+    
+    \begin{codebox}[Secuencia típica]
+        \ttfamily\small\color{gludWhite}
+        \# 1. Hacer cambios en archivos\\
+        vim archivo.java\\[6pt]
+        \# 2. Ver qué cambió\\
+        git status\\
+        git diff\\[6pt]
+        \# 3. Agregar al staging\\
+        git add archivo.java\\[6pt]
+        \# 4. Crear commit\\
+        git commit -m "feat: implementar nueva funcionalidad"\\[6pt]
+        \# 5. Enviar al remoto\\
+        git push
+    \end{codebox}
+\end{frame}
+
+\begin{frame}{Comandos de Ayuda}
+    \vspace{0.3cm}
+    
+    \begin{codebox}[Estructura del ejercicio]
+        \ttfamily\small\color{gludWhite}
+        mkdir proyecto-java \&\& cd proyecto-java\\
+        git init\\
+        mkdir -p src/main/java/com/ejemplo\\
+        touch README.md .gitignore\\
+        git add README.md\\
+        git commit -m "docs: agregar README"\\
+        git add .gitignore\\
+        git commit -m "chore: configurar gitignore"\\
+        \# ... continúa con más commits
+    \end{codebox}
+\end{frame}
+
+% SECTION 8: RESUMEN
+
+\section{Resumen}
+
+\begin{frame}{Lo que Aprendimos}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{Instalación:}
+            \begin{itemize}
+                \item Git en Linux
+                \item JDK 17 + Maven
+                \item Variables de entorno
+                \item Configuración global
+            \end{itemize}
+            
+            \vspace{0.3cm}
+            
+            \textbf{Conceptos:}
+            \begin{itemize}
+                \item Working Directory
+                \item Staging Area
+                \item Local Repository
+                \item Remote Repository
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \textbf{Comandos:}
+            \begin{itemize}
+                \item \inlinecode{git init}
+                \item \inlinecode{git add / git add -p}
+                \item \inlinecode{git commit}
+                \item \inlinecode{git diff / -{}-staged}
+                \item \inlinecode{git push / pull / fetch}
+                \item \inlinecode{git remote add}
+                \item \inlinecode{git clone}
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Recursos Útiles}
+    \vspace{0.5cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{Documentación:}
+            \begin{itemize}
+                \item Pro Git (libro oficial)
+                \item \url{https://git-scm.com/docs}
+                \item \url{https://training.github.com}
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \textbf{Práctica:}
+            \begin{itemize}
+                \item \url{https://learngitbranching.js.org}
+                \item \url{https://gitexercises.fracz.com}
+                \item GitHub Student Developer Pack
+            \end{itemize}
+        \end{column}
+    \end{columns}
+    
+    \vspace{1cm}
+    
+    \centering
+    {\large\color{gludOrange} La práctica hace al maestro}
+\end{frame}
+
+% Next class preview
+
+\begin{frame}[plain]
+\setbeamercolor{background canvas}{bg=gludPeach}
+\vspace{1.5cm}
+\centering
+
+{\Huge\color{gludOrange}\bfseries Próxima Clase}
+
+\vspace{0.5cm}
+
+{\Large\color{gludDark} Ramas y Desarrollo Colaborativo}
+
+\vspace{1cm}
+
+{\large\color{gludWhite} Estados del archivo (Untracked, Staged, Committed). Conventional Commits. Estructura de proyecto del stack elegido. Configuración de .gitignore apropiado (gitignore.io).}
+\end{frame}
+
+% Despedida
+
+\thankslide{¡Gracias!\\[0.3cm]{\hspace*{1cm}\Large Nos vemos en la próxima clase}}
+
+\end{document}

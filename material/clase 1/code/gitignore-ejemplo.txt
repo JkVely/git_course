@@ -1,0 +1,43 @@
+# Archivos compilados de Java
+*.class
+*.jar
+*.war
+*.ear
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+
+# IDEs
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.settings/
+.project
+.classpath
+
+# Sistema Operativo
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Logs y temporales
+*.log
+tmp/
+temp/
+*.tmp
+
+# Build tools
+build/
+dist/
+out/
