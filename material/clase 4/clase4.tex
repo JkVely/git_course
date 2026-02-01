@@ -1,0 +1,921 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+\usepackage{../theme}
+\usepackage{colortbl}
+
+% METADATA
+
+\title{Trabajando con Ramas}
+\subtitle{Branches, Git Flow y Estrategias de Desarrollo}
+\author{GLUD --- Grupo GNU/Linux Universidad Distrital}
+\date{Control de Versiones y Desarrollo Colaborativo}
+
+% DOCUMENT
+
+\begin{document}
+
+% Portada
+\titleframe[Clase 4 · Trabajando con Ramas]
+
+\contentsframe
+
+% SECTION 1: INTRODUCCIÓN A RAMAS
+
+\section{¿Qué son las Ramas?}
+
+\begin{frame}{El Concepto de Ramas}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Definición]
+        Una \highlight{rama} (branch) es una línea independiente de desarrollo que permite trabajar en características sin afectar el código principal.
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{¿Por qué usar ramas?}
+            \begin{itemize}
+                \item Aislar nuevas características
+                \item Experimentar sin riesgos
+                \item Trabajo paralelo en equipo
+                \item Mantener código estable
+            \end{itemize}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \textbf{Escenarios comunes:}
+            \begin{itemize}
+                \item Desarrollar nueva funcionalidad
+                \item Corregir bugs urgentes
+                \item Probar ideas experimentales
+                \item Preparar releases
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Visualizando Ramas}
+    
+    \begin{center}
+        \begin{tikzpicture}[
+            commit/.style={circle, fill=gludOrange, text=white, font=\tiny\bfseries, minimum size=0.6cm},
+            branch/.style={rectangle, rounded corners, fill=gludDarker, text=gludOrange, font=\tiny\ttfamily, inner sep=3pt},
+            arrow/.style={->, thick, gludOrangeLight}
+        ]
+            % Main branch
+            \node[commit] (c1) at (0,0) {C1};
+            \node[commit] (c2) at (2,0) {C2};
+            \node[commit] (c3) at (4,0) {C3};
+            \node[commit] (c6) at (6,0) {C6};
+            
+            % Feature branch
+            \node[commit] (c4) at (4,2) {C4};
+            \node[commit] (c5) at (6,2) {C5};
+            
+            % Connections
+            \draw[arrow] (c1) -- (c2);
+            \draw[arrow] (c2) -- (c3);
+            \draw[arrow] (c3) -- (c6);
+            \draw[arrow] (c3) -- (c4);
+            \draw[arrow] (c4) -- (c5);
+            
+            % Branch labels
+            \node[branch] at (0,-0.8) {main};
+            \node[branch] at (6,2.8) {feature};
+            
+            % Annotations
+            \node[text=gludWhite, font=\scriptsize] at (2,-1.5) {Rama principal};
+            \node[text=gludWhite, font=\scriptsize] at (5,3.5) {Desarrollo aislado};
+        \end{tikzpicture}
+    \end{center}
+    
+    \centering
+    {\color{gludOrangeLight} Las ramas permiten desarrollo paralelo sin interferencias}
+\end{frame}
+
+\quoteslide{A branch in Git is simply a lightweight movable pointer to a commit.}{Pro Git Book}
+
+% SECTION 2: COMANDOS BÁSICOS DE RAMAS
+
+\section{Comandos Básicos}
+
+\begin{frame}{Ver Ramas Existentes}
+    
+    \begin{orangebox}[git branch]
+        Lista todas las ramas locales. La rama actual se marca con \texttt{*}
+    \end{orangebox}
+    
+    \pause
+    
+    \begin{codebox}[Listar ramas locales]
+        \ttfamily\color{gludWhite}
+        git branch
+    \end{codebox}
+    
+    \pause
+    
+    \begin{codebox}[Salida]
+        \ttfamily\color{gludWhite}
+        \ \ develop\\
+        * main\\
+        \ \ feature/login
+    \end{codebox}
+\end{frame}
+
+\begin{frame}{Ver Ramas con Detalles}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{codebox}[Ver todas las ramas]
+                \ttfamily\small\color{gludWhite}
+                git branch -{-}all
+            \end{codebox}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{codebox}[Ver con último commit]
+                \ttfamily\small\color{gludWhite}
+                git branch -v
+            \end{codebox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Crear Ramas}
+    
+    \step{1}{Crear rama sin cambiar a ella}
+    
+    \begin{codebox}
+        \ttfamily\color{gludWhite}
+        git branch nombre-rama
+    \end{codebox}
+    
+    \pause
+    
+    \step{2}{Crear y cambiar a la rama (método clásico)}
+    
+    \begin{codebox}
+        \ttfamily\color{gludWhite}
+        git checkout -b nombre-rama
+    \end{codebox}
+    
+    \pause
+    
+    \step{3}{Crear y cambiar a la rama (método moderno)}
+    
+    \begin{codebox}
+        \ttfamily\color{gludWhite}
+        git switch -c nombre-rama
+    \end{codebox}
+    
+    \vspace{0.3cm}
+\end{frame}
+
+\begin{frame}{Cambiar entre Ramas}
+
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{codebox}[Método clásico]
+                \ttfamily\small\color{gludWhite}
+                git checkout nombre-rama
+            \end{codebox}
+            
+            {\small\color{gludLightGray} Comando tradicional}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \begin{codebox}[Método moderno]
+                \ttfamily\small\color{gludWhite}
+                git switch nombre-rama
+            \end{codebox}
+            
+            {\small\color{gludLightGray} Más intuitivo y seguro}
+        \end{column}
+    \end{columns}
+    \pause
+    
+    \begin{codebox}[Volver a la rama anterior]
+        \ttfamily\color{gludWhite}
+        git switch -
+    \end{codebox}
+
+    \pause
+    
+    \begin{orangebox}[Importante]
+        {\color{black}Antes de cambiar de rama, asegúrate de que tu \highlight{working directory} esté limpio o haz commit de tus cambios.}
+    \end{orangebox}
+\end{frame}
+
+\begin{frame}{Eliminar Ramas}
+    
+    \step{1}{Eliminar rama fusionada (seguro)}
+    
+    \begin{codebox}
+        \ttfamily\color{gludWhite}
+        git branch -d nombre-rama {\small\color{gludLightGray} \#Git verifica que la rama esté fusionada}
+    \end{codebox}
+    
+    \pause
+    
+    \step{2}{Eliminar rama forzosamente}
+    
+    \begin{codebox}
+        \ttfamily\color{gludWhite}
+        git branch -D nombre-rama {\small\color{gludLightGray} \#Elimina aunque no esté fusionada. \textbf{¡Cuidado!}}
+    \end{codebox}
+    
+    \pause
+    
+    \begin{alertbox}[Advertencia]
+        {\color{black}No puedes eliminar la rama en la que estás actualmente. Cambia a otra rama primero.}
+    \end{alertbox}
+\end{frame}
+
+\begin{frame}{Renombrar Ramas}
+
+    \begin{codebox}[Renombrar rama actual]
+        \ttfamily\color{gludWhite}
+        git branch -m nuevo-nombre
+    \end{codebox}
+
+    \pause
+    
+    \begin{codebox}[Renombrar otra rama]
+        \ttfamily\color{gludWhite}
+        git branch -m nombre-viejo nombre-nuevo
+    \end{codebox}
+
+    \pause
+    
+    \begin{orangebox}[Ejemplo práctico]
+        {\color{black}
+        \begin{itemize}
+            \item {\color{black}\texttt{git branch -m master main} --- Actualizar nomenclatura
+            \item \texttt{git branch -m feat/login feature/login} --- Corregir formato}
+        \end{itemize}
+        }
+    \end{orangebox}
+\end{frame}
+
+\begin{frame}[fragile]{Ejemplo Práctico: Flujo Básico}
+    \vspace{0.3cm}
+    
+    \begin{codebox}[Crear y trabajar en una rama]
+        \ttfamily\small\color{gludWhite}
+        \# Crear nueva rama para característica\\
+        git switch -c feature/calculadora\\
+        \\
+        \# Hacer cambios y commits\\
+        git add calculadora.py\\
+        git commit -m "feat: implementar suma"\\
+        \\
+        \# Volver a main\\
+        git switch main\\
+        \\
+        \# Eliminar rama (después de fusionar)\\
+        git branch -d feature/calculadora
+    \end{codebox}
+\end{frame}
+
+% SECTION 3: ESTRATEGIAS DE RAMAS
+
+\section{Estrategias de Ramas}
+
+\begin{frame}{¿Por qué Necesitamos Estrategias?}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[El Problema]
+        {\color{black}Sin una estrategia clara, los equipos crean ramas sin control, generando caos y conflictos.}
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \textbf{Consecuencias de no tener estrategia:}
+    \begin{itemize}
+        \item Nombres inconsistentes de ramas
+        \item No se sabe qué está en producción
+        \item Conflictos difíciles de resolver
+        \item Código sin revisar en producción
+        \item Dificultad para rastrear cambios
+    \end{itemize}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \centering
+    {\color{gludOrangeLight} \textbf{Solución:} Adoptar una estrategia de ramas estándar}
+\end{frame}
+
+\begin{frame}{Estrategias Principales}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{darkbox}[Git Flow]
+                {\color{gludWhite}
+                \textbf{Creado por:} Vincent Driessen (2010)
+                
+                \vspace{0.2cm}
+                
+                \textbf{Características:}
+                \begin{itemize}
+                    \item Múltiples ramas permanentes
+                    \item Estructura muy definida
+                    \item Ideal para releases planificados
+                    \item Más complejo pero robusto
+                \end{itemize}
+                }
+            \end{darkbox}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \begin{darkbox}[Feature Branch]
+                {\color{gludWhite}
+                \textbf{También llamado:} GitHub Flow
+                
+                \vspace{0.2cm}
+                
+                \textbf{Características:}
+                \begin{itemize}
+                    \item Una rama principal (main)
+                    \item Ramas por característica
+                    \item Más simple y flexible
+                    \item Más propensa a errores
+                \end{itemize}
+                }
+            \end{darkbox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    
+    \centering
+    {\color{gludOrangeLight} Ambas son válidas --- la elección depende del proyecto}
+\end{frame}
+
+% SECTION 4: GIT FLOW
+
+\section{Git Flow}
+
+\begin{frame}{Git Flow: Estructura}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Ramas Permanentes]
+        \begin{itemize}
+            {\color{black}
+            \item \texttt{main} --- Código en producción, siempre estable
+            \item \texttt{develop} --- Integración de características para próximo release
+            }
+        \end{itemize}
+    \end{orangebox}
+    
+    \vspace{0.3cm}
+    \pause
+    
+    \begin{orangebox}[Ramas Temporales]
+        \begin{itemize}
+            {\color{black}
+            \item \texttt{feature/*} --- Nuevas características (desde develop)
+            \item \texttt{release/*} --- Preparación de release (desde develop)
+            \item \texttt{hotfix/*} --- Correcciones urgentes (desde main)
+            }
+        \end{itemize}
+    \end{orangebox}
+\end{frame}
+
+\begin{frame}{Git Flow: Diagrama Visual}
+    
+    \begin{center}
+        \begin{figure}[H]
+            \includegraphics[width=0.54\textwidth]{img/git-flow-diagram.png}
+            \caption{\scriptsize Fuente: \url{https://www.atlassian.com/es/git/tutorials/comparing-workflows/gitflow-workflow}}
+        \end{figure}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Git Flow: Ciclo de Vida Feature}
+    
+    \step{1}{Crear feature desde develop}
+    
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        git switch develop\\
+        git switch -c feature/nueva-funcionalidad
+    \end{codebox}
+    
+    \pause
+    
+    \step{2}{Desarrollar y hacer commits}
+    
+    \pause
+    
+    \step{3}{Finalizar feature (fusionar a develop)}
+    
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        git switch develop\\
+        git merge feature/nueva-funcionalidad\\
+        git branch -d feature/nueva-funcionalidad
+    \end{codebox}
+\end{frame}
+
+\begin{frame}{Git Flow: Ciclo de Vida Hotfix}
+    \step{1}{Crear hotfix desde main}
+    
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        git switch main \& git switch -c hotfix/corregir-bug-critico
+    \end{codebox}
+    
+    \pause
+    
+    \step{2}{Corregir y commit}
+    
+    \pause
+    
+    \step{3}{Fusionar a main y develop}
+    
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        git switch main\\
+        git merge hotfix/corregir-bug-critico\\
+        git switch develop\\
+        git merge hotfix/corregir-bug-critico\\
+        git branch -d hotfix/corregir-bug-critico
+    \end{codebox}
+\end{frame}
+
+\begin{frame}{Git Flow: El Addon git-flow-avh}
+    \begin{orangebox}[git-flow (AVH Edition)]
+        {\color{black}Extensión oficial que simplifica los comandos de Git Flow creada por \highlight{Peter van der Does}.}
+    \end{orangebox}
+    
+    \pause
+    
+    \begin{codebox}[Instalación]
+        \ttfamily\small\color{gludWhite}
+        \# Linux (Debian/Ubuntu)\\
+        sudo apt install git-flow\\
+        \\
+        \# macOS\\
+        brew install git-flow-avh\\
+        \\
+        \# Windows (con Chocolatey)\\
+        choco install git-flow-avh
+    \end{codebox}
+\end{frame}
+
+\begin{frame}{git-flow: Inicialización}
+    \vspace{0.3cm}
+    
+    \begin{codebox}[Inicializar Git Flow en repositorio]
+        \ttfamily\color{gludWhite}
+        git flow init
+    \end{codebox}
+    
+    \vspace{0.3cm}
+    \pause
+    
+    \begin{codebox}[Preguntas interactivas]
+        \ttfamily\tiny\color{gludWhite}
+        Which branch should be used for bringing forth production releases?\\
+        \ \ \ Branch name for production releases: [main]\\
+        \\
+        Which branch should be used for integration of the "next release"?\\
+        \ \ \ Branch name for "next release" development: [develop]\\
+        \\
+        How to name your supporting branch prefixes?\\
+        \ \ \ Feature branches? [feature/]\\
+        \ \ \ Release branches? [release/]\\
+        \ \ \ Hotfix branches? [hotfix/]
+    \end{codebox}
+    
+    \vspace{0.3cm}
+    
+    {\scriptsize\color{gludLightGray} Acepta los valores por defecto presionando Enter}
+\end{frame}
+
+\begin{frame}{git-flow: Comandos Simplificados}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{darkbox}[Feature]
+                {\color{gludWhite}
+                \begin{codebox}
+                    \ttfamily\tiny\color{gludWhite}
+                    \# Iniciar\\
+                    git flow feature start login\\
+                    \\
+                    \# Finalizar\\
+                    git flow feature finish login
+                \end{codebox}
+                }
+            \end{darkbox}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \begin{darkbox}[Hotfix]
+                {\color{gludWhite}
+                \begin{codebox}
+                    \ttfamily\tiny\color{gludWhite}
+                    \# Iniciar\\
+                    git flow hotfix start 1.0.1\\
+                    \\
+                    \# Finalizar\\
+                    git flow hotfix finish 1.0.1
+                \end{codebox}
+                }
+            \end{darkbox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \begin{codebox}[Release]
+        \ttfamily\small\color{gludWhite}
+        git flow release start 2.0.0\\
+        git flow release finish 2.0.0
+    \end{codebox}
+    
+    \vspace{0.3cm}
+    
+    \centering
+    {\color{gludOrangeLight} \textbf{finish} automáticamente fusiona y elimina la rama}
+\end{frame}
+
+\begin{frame}{git-flow: Comparación de Comandos}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{darkbox}[Sin git-flow]
+                {\color{gludWhite}
+                \begin{codebox}
+                    \ttfamily\tiny\color{gludWhite}
+                    git switch develop\\
+                    git switch -c feature/login\\
+                    \# ... trabajo ...\\
+                    git switch develop\\
+                    git merge feature/login\\
+                    git branch -d feature/login
+                \end{codebox}
+                
+                {\scriptsize 5 comandos}
+                }
+            \end{darkbox}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{darkbox}[Con git-flow]
+                {\color{gludWhite}
+                \begin{codebox}
+                    \ttfamily\tiny\color{gludWhite}
+                    git flow feature start login\\
+                    \# ... trabajo ...\\
+                    git flow feature finish login
+                \end{codebox}
+                
+                {\scriptsize 2 comandos}
+                }
+            \end{darkbox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    \pause
+    
+    \begin{orangebox}[Ventaja]
+        {\color{black}Menos errores, más eficiencia, nombres consistentes automáticamente.}
+    \end{orangebox}
+\end{frame}
+
+\begin{frame}{Git Flow: Ventajas y Desventajas}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{\color{gludOrange} Ventajas}
+            \begin{itemize}
+                \item Muy estructurado y organizado
+                \item Producción siempre estable (main)
+                \item Ideal para releases planificados
+                \item Hotfixes bien definidos
+                \item Menos conflictos
+            \end{itemize}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \textbf{\color{gludOrange} Desventajas}
+            \begin{itemize}
+                \item Más complejo de aprender
+                \item Requiere disciplina del equipo
+                \item No ideal para CI/CD continuo
+                \item Overhead para proyectos pequeños
+                \item Dos ramas permanentes
+            \end{itemize}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    \pause
+    
+    \centering
+    {\color{gludOrangeLight} \textbf{Ideal para:} Proyectos grandes, equipos medianos/grandes, releases programados}
+\end{frame}
+
+% SECTION 5: FEATURE BRANCH WORKFLOW
+
+\section{Feature Branch Workflow}
+
+\begin{frame}{Feature Branch: Estructura}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Concepto]
+        {\color{black}Toda nueva característica o corrección se desarrolla en una rama separada desde \texttt{main}.}
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \textbf{Reglas básicas:}
+    \begin{itemize}
+        \item Una sola rama permanente: \texttt{main}
+        \item Cada developer crea ramas para sus tareas
+        \item Las ramas se fusionan a \texttt{main} cuando están listas
+        \item \texttt{main} siempre debe estar desplegable
+    \end{itemize}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \centering
+    {\color{gludOrangeLight} También conocido como \textbf{GitHub Flow}}
+\end{frame}
+
+\begin{frame}{Feature Branch: Diagrama Visual}
+    \vspace{0.3cm}
+    
+    \begin{center}
+        \begin{tikzpicture}[
+            commit/.style={circle, fill=gludOrange, text=white, font=\tiny\bfseries, minimum size=0.5cm},
+            branch/.style={rectangle, rounded corners, fill=gludDarker, text=gludOrange, font=\tiny\ttfamily, inner sep=2pt},
+            arrow/.style={->, thick}
+        ]
+            % Main branch
+            \node[commit] (m1) at (0,0) {C1};
+            \node[commit] (m2) at (2,0) {C2};
+            \node[commit] (m3) at (4,0) {C3};
+            \node[commit] (m4) at (6,0) {C4};
+            \node[commit] (m5) at (8,0) {C5};
+            
+            % Developer 1 branch
+            \node[commit] (d1a) at (2,1.5) {F1};
+            \node[commit] (d1b) at (3,1.5) {F2};
+            
+            % Developer 2 branch
+            \node[commit] (d2a) at (4,3) {B1};
+            \node[commit] (d2b) at (5,3) {B2};
+            \node[commit] (d2c) at (6,3) {B3};
+            
+            % Arrows
+            \draw[arrow, gludOrangeLight] (m1) -- (m2);
+            \draw[arrow, gludOrangeLight] (m2) -- (m3);
+            \draw[arrow, gludOrangeLight] (m3) -- (m4);
+            \draw[arrow, gludOrangeLight] (m4) -- (m5);
+            
+            \draw[arrow, gludPeach] (m2) -- (d1a);
+            \draw[arrow, gludOrangeLight] (d1a) -- (d1b);
+            \draw[arrow, gludPeach] (d1b) -- (m3);
+            
+            \draw[arrow, gludPeach] (m3) -- (d2a);
+            \draw[arrow, gludOrangeLight] (d2a) -- (d2b);
+            \draw[arrow, gludOrangeLight] (d2b) -- (d2c);
+            \draw[arrow, gludPeach] (d2c) -- (m5);
+            
+            % Labels
+            \node[branch] at (0,-0.7) {main};
+            \node[branch] at (3,2.2) {dev1/feature};
+            \node[branch] at (6,3.7) {dev2/bugfix};
+        \end{tikzpicture}
+    \end{center}
+    
+    \vspace{0.3cm}
+    
+    {\scriptsize\color{gludLightGray} Cada desarrollador trabaja en sus propias ramas y las fusiona cuando completa}
+\end{frame}
+
+\begin{frame}{Feature Branch: Flujo de Trabajo}
+    \step{1}{Crear rama desde main}
+    
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        git switch main\\
+        git pull\\
+        git switch -c juan/agregar-autenticacion
+    \end{codebox}
+    
+    \pause
+    
+    \step{2}{Desarrollar y hacer commits}
+    \pause
+    
+    \step{3}{Fusionar a main}
+    
+    \begin{codebox}
+        \ttfamily\small\color{gludWhite}
+        git switch main \& git pull\\
+        git merge juan/agregar-autenticacion\\
+        git push
+    \end{codebox}
+\end{frame}
+
+\begin{frame}{Feature Branch: Convenciones de Nombres}
+    
+    \begin{orangebox}[Formato común: desarrollador/descripción]
+        \begin{itemize}
+            {\color{black}
+            \item \texttt{juan/login-page}
+            \item \texttt{maria/fix-database-error}
+            \item \texttt{carlos/refactor-api}
+            }
+        \end{itemize}
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \textbf{Alternativas:}
+    \begin{itemize}
+        \item Por ticket: \texttt{JIRA-123-login}, \texttt{issue-45-bug}
+        \item Mixto: \texttt{juan/feature/login}
+    \end{itemize}
+
+    \pause
+    
+    \centering
+    {\color{gludOrangeLight} \textbf{Importante:} El equipo debe acordar y seguir una convención}
+\end{frame}
+
+\begin{frame}{Feature Branch: Ventajas y Desventajas}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{\color{gludOrange} Ventajas}
+            \begin{itemize}
+                \item Muy simple de entender
+                \item Ideal para CI/CD
+                \item Flexibilidad total
+                \item Rápido para equipos pequeños
+                \item Menos overhead
+            \end{itemize}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \textbf{\color{gludOrange} Desventajas}
+            \begin{itemize}
+                \item Sin estructura formal
+                \item Propenso a errores humanos
+                \item Puede volverse caótico
+                \item Difícil gestionar releases
+                \item Requiere code reviews estrictas
+            \end{itemize}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    \pause
+    
+    \centering
+    {\color{gludOrangeLight} \textbf{Ideal para:} Equipos pequeños, despliegue continuo, proyectos ágiles}
+\end{frame}
+
+% SECTION 6: COMPARACIÓN Y BUENAS PRÁCTICAS
+
+\section{Comparación y Buenas Prácticas}
+
+\begin{frame}{¿Cuál Elegir?}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{darkbox}[Elige Git Flow si:]
+                {\color{gludWhite}
+                \begin{itemize}
+                    \item Tienes releases programados
+                    \item Equipo mediano o grande
+                    \item Múltiples versiones en paralelo
+                    \item Necesitas estabilidad máxima
+                    \item Proceso formal de QA
+                \end{itemize}
+                }
+            \end{darkbox}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \begin{darkbox}[Elige Feature Branch si:]
+                {\color{gludWhite}
+                \begin{itemize}
+                    \item Despliegue continuo
+                    \item Equipo pequeño
+                    \item Proyecto ágil/startup
+                    \item Quieres simplicidad de desarrollo
+                    \item Menos burocracia en el flujo de trabajo
+                \end{itemize}
+                }
+            \end{darkbox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    \pause
+    
+    \centering
+    {\color{gludOrangeLight} No hay una respuesta única --- depende del contexto}
+\end{frame}
+
+\begin{frame}{Buenas Prácticas Universales}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Aplica a cualquier estrategia]
+        \begin{itemize}
+            {\color{black}
+            \item \textbf{Nombres descriptivos:} \texttt{feature/login-oauth} mejor que \texttt{rama1}
+            \item \textbf{Ramas cortas:} Fusionar frecuentemente para evitar conflictos
+            \item \textbf{main siempre estable:} No hacer commit directo a main
+            \item \textbf{Sincronizar:} Hacer \texttt{git pull} antes de crear ramas
+            \item \textbf{Eliminar ramas fusionadas:} Mantener repositorio limpio
+            }
+        \end{itemize}
+    \end{orangebox}
+\end{frame}
+
+% SECTION 7: SIGUIENTE PASO
+
+\section{¿Qué sigue?}
+
+\begin{frame}{Fusionar Ramas: Merge}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Próxima Clase]
+        {\color{black}Hemos visto cómo crear y gestionar ramas, pero ¿cómo las \highlight{unimos}?}
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    \pause
+    
+    \textbf{En la Clase 5 aprenderemos:}
+    \begin{itemize}
+        \item \texttt{git merge} --- Fusionar ramas
+        \item \texttt{git rebase} --- Reescribir historial
+        \item Resolución de conflictos
+        \item Fast-forward vs 3-way merge
+        \item Estrategias de fusión
+        \item Cherry-pick
+    \end{itemize}
+    
+    \vspace{0.4cm}
+    
+    \centering
+    {\color{gludOrangeLight} ¡La verdadera magia de Git viene al combinar ramas!}
+\end{frame}
+
+\quoteslide{Branches are cheap and easy, use them early and often.}{Git Best Practices}
+
+\begin{frame}{Comandos Clave}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{darkbox}[Git Estándar]
+                {\color{gludWhite}
+                \begin{codebox}
+                    \ttfamily\tiny\color{gludWhite}
+                    git branch\\
+                    git switch -c nombre\\
+                    git switch nombre\\
+                    git branch -d nombre\\
+                    git branch -{-}merged
+                \end{codebox}
+                }
+            \end{darkbox}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{darkbox}[git-flow]
+                {\color{gludWhite}
+                \begin{codebox}
+                    \ttfamily\tiny\color{gludWhite}
+                    git flow init\\
+                    git flow feature start\\
+                    git flow feature finish\\
+                    git flow hotfix start\\
+                    git flow hotfix finish
+                \end{codebox}
+                }
+            \end{darkbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\thankslide{¡Gracias!\\[0.3cm]{\hspace*{1cm}\Large Nos vemos en la próxima clase}}
+
+\end{document}
