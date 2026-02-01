@@ -1,0 +1,433 @@
+% GLUD Presentation Theme - Black & Orange Style
+% Universidad Distrital Francisco José de Caldas
+% Grupo GNU/Linux Universidad Distrital (GLUD)
+
+% Requires: beamer documentclass
+
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{theme}[GLUD Presentation Theme v1.0]
+
+% REQUIRED PACKAGES
+
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[T1]{fontenc}
+\RequirePackage{tikz}
+\RequirePackage{amsmath}
+\RequirePackage{pifont}
+\RequirePackage{graphicx}
+\RequirePackage{xcolor}
+\RequirePackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usetikzlibrary{calc}
+
+
+\definecolor{gludDark}{HTML}{2B3A42}        % Dark blue-gray background
+\definecolor{gludDarker}{HTML}{1A252B}      % Darker shade
+\definecolor{gludOrange}{HTML}{F05032}      % Git official orange
+\definecolor{gludOrangeDark}{HTML}{C73E28}  % Darker orange for gradients
+\definecolor{gludOrangeLight}{HTML}{F58873} % Light orange
+\definecolor{gludPeach}{HTML}{FADCD9}       % Peach/salmon background
+\definecolor{gludPink}{HTML}{FCE8E6}        % Light pink accent
+\definecolor{gludWhite}{HTML}{FFFFFF}       % White
+\definecolor{gludGray}{HTML}{4A4A4A}        % Gray text
+\definecolor{gludLightGray}{HTML}{9A9A9A}   % Light gray
+
+% BEAMER THEME CONFIGURATION
+
+\mode<presentation>
+
+% Navigation symbols (compact)
+\setbeamertemplate{navigation symbols}{
+}
+
+% Frame numbering in footer (fits within slide)
+\setbeamertemplate{footline}{%
+    \vspace{0.2cm}% small lift from bottom edge
+    \begin{beamercolorbox}[wd=\paperwidth,ht=0.45cm,dp=0.15cm,leftskip=0.85cm,rightskip=0.85cm]{background canvas}
+        \hfill
+        \tikz[baseline={(num.base)}]{\node[fill=gludDarker,rounded corners=3pt,inner sep=6pt,text=gludLightGray,font=\scriptsize] (num) {\insertframenumber\, / \,\inserttotalframenumber};}%
+        \hspace{0.85cm}%
+    \end{beamercolorbox}%
+}
+
+% Background and text colors
+\setbeamercolor{background canvas}{bg=gludDark}
+\setbeamercolor{normal text}{fg=gludWhite}
+\setbeamercolor{frametitle}{fg=gludWhite}
+\setbeamercolor{title}{fg=gludWhite}
+\setbeamercolor{subtitle}{fg=gludOrangeLight}
+\setbeamercolor{author}{fg=gludWhite}
+\setbeamercolor{date}{fg=gludLightGray}
+\setbeamercolor{itemize item}{fg=gludOrange}
+\setbeamercolor{itemize subitem}{fg=gludOrangeLight}
+\setbeamercolor{enumerate item}{fg=gludOrange}
+\setbeamercolor{block title}{fg=gludWhite,bg=gludOrange}
+\setbeamercolor{block body}{fg=gludWhite,bg=gludDarker}
+
+% Fonts
+\setbeamerfont{title}{size=\Huge,series=\bfseries}
+\setbeamerfont{subtitle}{size=\large}
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+\setbeamerfont{framesubtitle}{size=\normalsize}
+\setbeamerfont{author}{size=\normalsize}
+\setbeamerfont{date}{size=\small}
+
+% Itemize bullets
+\setbeamertemplate{itemize item}{\color{gludOrange}\textbullet}
+\setbeamertemplate{itemize subitem}{\color{gludOrangeLight}--}
+\setbeamertemplate{enumerate item}{\color{gludOrange}\insertenumlabel.}
+
+% TOC VISUALS
+
+% Circle + label for section entries in the TOC
+\defbeamertemplate{section in toc}{glud timeline}{%
+    \leavevmode
+    \begin{tikzpicture}[baseline=(label.base)]
+        \node[circle,fill=gludOrange,text=gludWhite,minimum size=0.75cm,font=\bfseries] (dot) {\inserttocsectionnumber};
+        \node[anchor=west,text=gludWhite,font=\bfseries] (label) at ($(dot.east)+(0.35,0)$) {\inserttocsection};
+    \end{tikzpicture}\par
+}
+
+\setbeamertemplate{section in toc}[glud timeline]
+
+% CUSTOM BOXES
+
+% Orange highlight box (for definitions, important content)
+\newtcolorbox{orangebox}[1][]{
+    colback=gludOrange!20,
+    colframe=gludOrange,
+    coltitle=gludWhite,
+    fonttitle=\bfseries,
+    boxrule=0pt,
+    arc=3pt,
+    left=8pt, right=8pt, top=6pt, bottom=6pt,
+    title=#1,
+    coltext=black
+}
+
+% Dark box (for secondary content)
+\newtcolorbox{darkbox}[1][]{
+    colback=gludDarker,
+    colframe=gludGray,
+    coltitle=gludWhite,
+    fonttitle=\bfseries,
+    coltext=gludWhite,
+    boxrule=1pt,
+    arc=3pt,
+    left=8pt, right=8pt, top=6pt, bottom=6pt,
+    title=#1
+}
+
+% Code box (for code snippets)
+\newtcolorbox{codebox}[1][]{
+    colback=gludDarker,
+    colframe=gludOrange,
+    coltitle=gludWhite,
+    fonttitle=\bfseries\ttfamily,
+    boxrule=1pt,
+    arc=0pt,
+    left=8pt, right=8pt, top=6pt, bottom=6pt,
+    title=#1
+}
+
+% Warning/alert box
+\newtcolorbox{alertbox}[1][]{
+    colback=gludOrange!30,
+    colframe=gludOrange,
+    coltitle=gludDark,
+    fonttitle=\bfseries,
+    boxrule=2pt,
+    arc=3pt,
+    left=8pt, right=8pt, top=6pt, bottom=6pt,
+    title=#1
+}
+
+% UTILITY COMMANDS
+
+% Highlighted text
+\newcommand{\highlight}[1]{\textcolor{gludOrange}{\textbf{#1}}}
+
+% Inline code
+\newcommand{\inlinecode}[1]{\texttt{\color{gludOrange}#1}}
+
+% Orange bullet point
+\newcommand{\orangebullet}{\textcolor{gludOrange}{\textbullet}}
+
+% Circled letter/number (for steps, options A/B/C)
+\newcommand{\circled}[1]{%
+    \tikz[baseline=(char.base)]{%
+        \node[circle,fill=gludOrange,text=white,inner sep=2pt,font=\bfseries] (char) {#1};%
+    }%
+}
+
+% Step indicator with number and text
+\newcommand{\step}[2]{%
+    \tikz[baseline=(num.base)]{%
+        \node[circle,fill=gludOrange,text=white,minimum size=0.8cm,font=\bfseries] (num) {#1};%
+    }%
+    \hspace{0.3cm}{\large #2}%
+}
+
+% Progress dots (pre-defined for 5 steps)
+\newcommand{\progressA}{\textcolor{gludOrange}{$\bullet$}\textcolor{gludGray}{$\bullet$}\textcolor{gludGray}{$\bullet$}\textcolor{gludGray}{$\bullet$}\textcolor{gludGray}{$\bullet$}}
+\newcommand{\progressB}{\textcolor{gludGray}{$\bullet$}\textcolor{gludOrange}{$\bullet$}\textcolor{gludGray}{$\bullet$}\textcolor{gludGray}{$\bullet$}\textcolor{gludGray}{$\bullet$}}
+\newcommand{\progressC}{\textcolor{gludGray}{$\bullet$}\textcolor{gludGray}{$\bullet$}\textcolor{gludOrange}{$\bullet$}\textcolor{gludGray}{$\bullet$}\textcolor{gludGray}{$\bullet$}}
+\newcommand{\progressD}{\textcolor{gludGray}{$\bullet$}\textcolor{gludGray}{$\bullet$}\textcolor{gludGray}{$\bullet$}\textcolor{gludOrange}{$\bullet$}\textcolor{gludGray}{$\bullet$}}
+\newcommand{\progressE}{\textcolor{gludGray}{$\bullet$}\textcolor{gludGray}{$\bullet$}\textcolor{gludGray}{$\bullet$}\textcolor{gludGray}{$\bullet$}\textcolor{gludOrange}{$\bullet$}}
+
+% Dynamic section progress dots
+\newcommand{\sectionprogress}{%
+    \begingroup
+    \def\maxsections{\ifcsname beamer@sectionmax\endcsname\beamer@sectionmax\else\insertsectionnumber\fi}%
+    \begin{tikzpicture}[baseline=-0.4ex]
+        \foreach \x in {1,...,\maxsections}{
+            \ifnum\x=\insertsectionnumber
+                \fill[gludOrange] (0.32*\x,0) circle (0.07);
+            \else
+                \fill[gludGray] (0.32*\x,0) circle (0.06);
+            \fi
+        }
+    \end{tikzpicture}%
+    \endgroup
+}
+
+% SLIDE TEMPLATES (TikZ backgrounds)
+
+% Title slide background (dark base + layered accents)
+\newcommand{\titlebg}{%
+    \begin{tikzpicture}[remember picture,overlay]
+        \fill[gludDark] (current page.north west) rectangle (current page.south east);
+        \fill[gludOrange] ([xshift=-1cm,yshift=0cm]current page.south west) -- ([xshift=7cm,yshift=0cm]current page.south west) -- ([xshift=5cm,yshift=-5cm]current page.north west) -- cycle;
+        \fill[gludPeach] ([xshift=6cm,yshift=0cm]current page.south west) -- ([xshift=13cm,yshift=0cm]current page.south west) -- ([xshift=10cm,yshift=-4cm]current page.north west) -- cycle;
+        \fill[gludOrangeDark] ([xshift=-2cm,yshift=-0.5cm]current page.north east) circle (2.2cm);
+        \fill[gludPeach] ([xshift=-3cm,yshift=1cm]current page.north east) circle (3cm);
+    \end{tikzpicture}%
+}
+
+% Section slide background (orange right panel)
+\newcommand{\sectionbg}{%
+    \begin{tikzpicture}[remember picture,overlay]
+        \fill[gludOrange] ([xshift=-5cm]current page.north east) rectangle (current page.south east);
+    \end{tikzpicture}%
+}
+
+% Quote slide background (peach left strip)
+\newcommand{\quotebg}{%
+    \begin{tikzpicture}[remember picture,overlay]
+        \fill[gludPeach] (current page.north west) rectangle ([xshift=4cm]current page.south west);
+    \end{tikzpicture}%
+}
+
+% Thank you slide background (full peach with orange block)
+\newcommand{\thanksbg}{%
+    \begin{tikzpicture}[remember picture,overlay]
+        \fill[gludPeach] (current page.north west) rectangle (current page.south east);
+        \fill[gludOrange] ([xshift=-6cm,yshift=-2cm]current page.north east) rectangle ([yshift=2cm]current page.south east);
+    \end{tikzpicture}%
+}
+% Alternative thank you slide background (diagonal split design)
+\newcommand{\thanksbgalt}{%
+    \begin{tikzpicture}[remember picture,overlay]
+        \fill[gludDark] (current page.north west) rectangle (current page.south east);
+        \fill[gludOrange] (current page.north west) -- (current page.north east) -- ([yshift=2cm]current page.south east) -- ([xshift=-3cm]current page.south west) -- cycle;
+        \fill[gludPeach] ([xshift=-2cm]current page.south west) rectangle ([xshift=1.5cm]current page.north west);
+        \node[circle,fill=gludOrangeDark,opacity=0.3,minimum size=8cm] at ([xshift=-3cm,yshift=-2cm]current page.north east) {};
+        \node[circle,fill=gludPeach,opacity=0.2,minimum size=6cm] at ([xshift=2cm,yshift=1cm]current page.south west) {};
+    \end{tikzpicture}%
+}
+% TOC background
+\newcommand{\tocbg}{%
+    \begin{tikzpicture}[remember picture,overlay]
+        \fill[gludDark] (current page.north west) rectangle (current page.south east);
+        \fill[gludOrange] (current page.north west) rectangle ([xshift=0.65cm]current page.south west);
+    \end{tikzpicture}%
+}
+
+% STRUCTURED FRAMES
+
+% Title frame (uses document metadata)
+% Optional argument lets you add a short kicker/subline
+\newcommand{\titleframe}[1][]{%
+    \begin{frame}[plain]
+    \titlebg
+    \vspace{1.5cm}
+    \hspace{0.8cm}
+    \begin{minipage}{0.55\textwidth}
+        {\usebeamerfont{title}\usebeamercolor[fg]{title}\inserttitle\par}
+        \vspace{0.4cm}
+        {\usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}\insertsubtitle\par}
+        \vspace{0.8cm}
+        {\usebeamerfont{author}\usebeamercolor[fg]{author}\insertauthor\par}
+        \vspace{0.25cm}
+        {\usebeamerfont{date}\usebeamercolor[fg]{date}\insertdate\par}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.3\textwidth}
+        \raggedleft
+        {\color{gludPeach}\rule{0.35\textwidth}{1.5pt}}\\[4pt]
+        {\small\color{gludLightGray}\ifx\relax#1\relax Control de versiones\else #1\fi}\par
+    \end{minipage}
+    \end{frame}
+}
+
+% Contents frame (auto-generates nodes from \section)
+\newcommand{\contentsframe}{%
+    \begin{frame}[plain]
+    \tocbg
+    \vspace{0.5cm}
+    \begin{center}
+        {\Large\color{gludWhite}\bfseries Mapa de ruta}\par
+    \end{center}
+    \vspace{0.8cm}
+    \begin{columns}[t]
+        \begin{column}{0.48\textwidth}
+            \tableofcontents[sections={1,2,3},hideallsubsections]
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \tableofcontents[sections={4,5,6},hideallsubsections]
+        \end{column}
+    \end{columns}
+    \end{frame}
+}
+
+% FRAME TITLE TEMPLATE
+
+\setbeamertemplate{frametitle}{%
+    \nointerlineskip
+    \begin{beamercolorbox}[wd=\paperwidth,ht=1.25cm,dp=0.25cm,leftskip=1.2cm,rightskip=1.2cm]{frametitle}
+        \usebeamerfont{frametitle}\insertframetitle
+        \hfill{\small\color{gludOrangeLight}\insertsectionhead}
+    \end{beamercolorbox}%
+    \nointerlineskip
+    \color{gludOrange}\rule{\paperwidth}{0.14cm}%
+    \vspace{0.08cm}%
+}
+
+% SECTION SLIDE COMMAND
+% Usage: \sectionslide{01}{Section Title}
+\newcommand{\sectionslide}[2]{%
+    \begin{frame}[plain]
+    \sectionbg
+    \vspace{3cm}
+    \begin{minipage}{0.6\textwidth}
+        \hspace{0.5cm}
+        {\fontsize{60}{60}\selectfont\color{gludOrange}\bfseries #1\par}
+        \vspace{0.5cm}
+        \hspace{1cm}
+        {\LARGE\color{gludWhite}\bfseries #2\par}
+        \vspace{0.5cm}
+        \hspace{1cm}
+        {\color{gludOrange}\rule{0.4\textwidth}{2pt}}\\
+        \vspace{0.4cm}
+        \hspace{1cm}
+        {\sectionprogress}
+    \end{minipage}
+    \end{frame}
+}
+
+% SECTION SLIDE (AUTO NUMBER)
+% Usage: \sectionslideauto{Section Title}
+\newcommand{\sectionslideauto}[1]{%
+    \sectionslide{\insertsectionnumber}{#1}%
+}
+
+% QUOTE SLIDE COMMAND
+% Usage: \quoteslide{Quote text here}{Author Name}
+\newcommand{\quoteslide}[2]{%
+    \begin{frame}[plain]
+    \quotebg
+    \vspace{0.5cm}
+    \hspace{4.5cm}
+    \begin{minipage}{0.65\textwidth}
+        \raggedright
+        {\color{gludOrange}\fontsize{48}{48}\selectfont``\par}
+        \vspace{-1cm}
+        {\Large\color{gludWhite}\textit{#1}\par}
+        \vspace{0.8cm}
+        {\normalsize\color{gludOrangeLight}--- #2\par}
+    \end{minipage}
+    \end{frame}
+}
+
+% THANK YOU SLIDE COMMAND
+
+% Usage: \thankslide{Thank You Text}
+\newcommand{\thankslide}[1]{%
+    \begin{frame}[plain]
+    \thanksbgalt
+    \vspace{3.0cm}
+    \begin{minipage}{0.7\textwidth}
+        \hspace{1.5cm}
+        {\fontsize{48}{48}\selectfont\color{gludWhite}\bfseries #1\par}
+        \vspace{0.8cm}
+        \hspace{1.5cm}
+        {\color{gludOrange}\rule{0.5\textwidth}{3pt}}
+    \end{minipage}
+    \end{frame}
+}
+
+% IMAGE COMMANDS
+
+% Centered image with caption
+% Usage: \centeredimg{path/to/image}{0.8\textwidth}{Caption text}
+\newcommand{\centeredimg}[3]{%
+    \begin{center}
+        \includegraphics[width=#2]{#1}
+        
+        \vspace{0.3cm}
+        {\small\color{gludLightGray}#3}
+    \end{center}
+}
+
+% Image in orange frame
+% Usage: \framedimg{path/to/image}{0.6\textwidth}
+\newcommand{\framedimg}[2]{%
+    \begin{center}
+        \tcbox[colback=gludDarker,colframe=gludOrange,boxrule=2pt,arc=3pt]{%
+            \includegraphics[width=#2]{#1}%
+        }
+    \end{center}
+}
+
+% Side by side images
+% Usage: \twoimages{img1}{img2}{caption1}{caption2}
+\newcommand{\twoimages}[4]{%
+    \begin{columns}[c]
+        \begin{column}{0.48\textwidth}
+            \centering
+            \includegraphics[width=0.9\linewidth]{#1}
+            
+            {\small\color{gludLightGray}#3}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \centering
+            \includegraphics[width=0.9\linewidth]{#2}
+            
+            {\small\color{gludLightGray}#4}
+        \end{column}
+    \end{columns}
+}
+
+
+% SPECIAL FRAME ENVIRONMENTS
+
+% Light background frame (for contrast)
+% Usage: \begin{lightframe}{Title} content \end{lightframe}
+\newenvironment{lightframe}[1]{%
+    \setbeamercolor{background canvas}{bg=gludPeach}%
+    \setbeamercolor{normal text}{fg=gludDark}%
+    \setbeamercolor{frametitle}{fg=gludDark}%
+    \begin{frame}{#1}%
+}{%
+    \end{frame}%
+}
+
+% AUTOMATIONS
+
+% Insert a styled section slide automatically at each \section
+\AtBeginSection[]{%
+    \sectionslideauto{\insertsection}%
+}
+
+\mode<all>

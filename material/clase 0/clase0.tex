@@ -1,0 +1,741 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+\usepackage{../theme}
+
+% METADATA
+
+\title{Ingeniería de Software Colaborativa}
+\subtitle{Git, GitHub/GitLab y CI/CD para el Mundo Real}
+\author{GLUD --- Grupo GNU/Linux\\Universidad Distrital}
+\date{Curso Complementario · 10 Semanas}
+
+% DOCUMENT
+
+\begin{document}
+
+% Portada renovada
+\titleframe[Clase 0 · Bienvenida al Curso]
+
+
+\contentsframe
+
+
+% SECTION 1: PRESENTACIÓN
+
+\section{Presentación}
+
+\begin{frame}{¿Quién soy?}
+    
+    \begin{columns}[T]
+        \begin{column}{0.55\textwidth}
+            \begin{orangebox}[Tu Instructor]
+                {\Large\color{gludDark} Estudiante de Ingeniería de Sistemas}
+                
+                \vspace{0.2cm}
+                
+                \textbf{Miembro activo de GLUD}
+                
+                {\small Grupo GNU/Linux Universidad Distrital}
+                
+                \vspace{0.4cm}
+                
+                \textbf{¿Por qué estoy aquí?}
+                \begin{itemize}
+                    \item {\color{black}Experiencia práctica con Git/GitHub
+                    \item Certificación profesional en Git
+                    \item Proyectos colaborativos reales}
+                \end{itemize}
+            \end{orangebox}
+        \end{column}
+        \pause
+        \begin{column}{0.4\textwidth}
+            \centering
+            
+            \begin{darkbox}[Certificación]
+                \vspace{0.2cm}
+                
+                {\small\color{gludOrangeLight} Platzi - Git \& GitHub}
+                
+                \vspace{0.2cm}
+                
+                \fbox{\includegraphics[width=0.9\textwidth]{docs/diploma-git-github.pdf}}
+                
+                \vspace{0.2cm}
+                
+                {\tiny Formación profesional validada}
+                
+            \end{darkbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{¿Por qué este curso?}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{alertbox}[La Realidad]
+                \textbf{Lo que NO te enseñan en clase:}
+                \begin{itemize}
+                    \item {\color{black}Trabajo colaborativo asíncrono
+                    \item Control de versiones profesional
+                    \item Flujos de trabajo en equipos
+                    \item Automatización de procesos
+                    \item Code Review y mejores prácticas}
+                \end{itemize}
+            \end{alertbox}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \begin{darkbox}[Lo que aprenderás aquí]
+                \textbf{Herramientas del mundo real:}
+                \begin{itemize}
+                    \item Git desde cero hasta avanzado
+                    \item GitHub/GitLab como profesional
+                    \item Pipelines de CI/CD
+                    \item Trabajo en equipo simulado
+                    \item Proyectos con evidencia auditable
+                \end{itemize}
+            \end{darkbox}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    \pause
+    \centering
+    {\Large\color{gludOrange} Este curso cierra la brecha entre la academia y la industria}
+\end{frame}
+
+\quoteslide{La mejor inversión que puedes hacer como desarrollador es aprender a trabajar en equipo usando las herramientas correctas.}{Industria del Software}
+
+
+% SECTION 2: EL CURSO
+
+\section{Sobre el Curso} 
+
+\begin{frame}{Información del Curso}
+    
+    \begin{orangebox}[ISC-GIT-101]
+        {\Large\color{gludDark}\bfseries Ingeniería de Software Colaborativa: Git y CI/CD}
+    \end{orangebox}
+    
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{Duración y Formato:}
+            \begin{itemize}
+                \item \highlight{10 semanas} ($\approx$40 horas)
+                \item Sesiones teórico-prácticas
+                \item Proyecto colaborativo real
+            \end{itemize}
+            
+            \textbf{Tipo de Curso:}
+            \begin{itemize}
+                \item Complementario
+                \item Electivo
+            \end{itemize}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \textbf{Requisitos:}
+            \begin{itemize}
+                \item Conocimientos básicos de programación
+                \item Cualquier lenguaje (Java, Python, JS...)
+                \item Computador/VM con Linux
+            \end{itemize}
+            
+            \textbf{Certificación:}
+            \begin{itemize}
+                \item Validación por evidencia
+                \item Repositorio auditado
+                \item 70/100 para aprobar
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Objetivo General}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[¿Qué vas a lograr?]
+        Al finalizar este curso serás capaz de:
+    \end{orangebox}
+    
+    \vspace{0.5cm}
+    
+    \begin{itemize}
+        \item \textbf{Gestionar proyectos profesionalmente} usando Git y GitHub/GitLab
+        
+        \vspace{0.3cm}
+        
+        \item \textbf{Trabajar en equipos} siguiendo flujos colaborativos estándar de la industria
+        
+        \vspace{0.3cm}
+        
+        \item \textbf{Automatizar procesos} de construcción y pruebas con pipelines CI/CD
+        
+        \vspace{0.3cm}
+        
+        \item \textbf{Aplicar mejores prácticas} de ingeniería de software en cualquier stack tecnológico
+        
+        \vspace{0.3cm}
+        
+        \item \textbf{Demostrar competencias} con evidencia auditable de trabajo colaborativo
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{¿Qué aprenderás exactamente?}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{Competencias Técnicas:}
+            \begin{itemize}
+                \item Configurar entornos profesionales
+                \item Dominar Git (local y remoto)
+                \item Gestión de ramas y conflictos
+                \item Pipelines de CI/CD automáticos
+                \item Integración con herramientas (Maven, npm, pytest...)
+            \end{itemize}
+            
+            \vspace{0.2cm}
+            
+            \textbf{Estándares de Industria:}
+            \begin{itemize}
+                \item Conventional Commits
+                \item Semantic Versioning
+                \item Git Flow
+                \item Code Review
+            \end{itemize}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \textbf{Competencias Colaborativas:}
+            \begin{itemize}
+                \item Trabajo en equipos multidisciplinarios
+                \item Roles rotativos (Tech Lead/Developer)
+                \item Comunicación técnica efectiva
+                \item Pull Requests y revisiones
+                \item Gestión de Issues y Milestones
+            \end{itemize}
+            
+            \vspace{0.2cm}
+            
+            \textbf{Preparación Profesional:}
+            \begin{itemize}
+                \item Flujos DevOps
+                \item Metodologías ágiles
+                \item Entrega continua
+                \item Portfolio demostrable
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+
+% SECTION 3: CRONOGRAMA
+
+\section{Cronograma}
+
+\begin{frame}{Módulo 1: Fundamentos (Semanas 1-3)}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.3\textwidth}
+            \centering
+            
+            \circled{1}
+            
+            \textbf{Semana 1}
+            
+            {\small\color{gludOrange} Configuración}
+            
+            \vspace{0.2cm}
+            
+            {\tiny
+            \begin{itemize}
+                \item Git + herramientas
+                \item Variables de entorno
+                \item Arquitectura de Git
+                \item Primer \texttt{git init}
+            \end{itemize}
+            }
+        \end{column}
+        \begin{column}{0.3\textwidth}
+            \centering
+            
+            \circled{2}
+            
+            \textbf{Semana 2}
+            
+            {\small\color{gludOrange} Ciclo de Vida}
+            
+            \vspace{0.2cm}
+            
+            {\tiny
+            \begin{itemize}
+                \item Estados del código
+                \item Conventional Commits
+                \item Estructura de proyecto
+                \item \texttt{.gitignore}
+            \end{itemize}
+            }
+        \end{column}
+        \begin{column}{0.3\textwidth}
+            \centering
+            
+            \circled{3}
+            
+            \textbf{Semana 3}
+            
+            {\small\color{gludOrange} Historial}
+            
+            \vspace{0.2cm}
+            
+            {\tiny
+            \begin{itemize}
+                \item \texttt{git log} avanzado
+                \item \texttt{git diff}
+                \item \texttt{git restore}
+                \item Tags y versiones
+            \end{itemize}
+            }
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    \pause
+    
+    \begin{darkbox}[Entrega Parcial 1]
+        \centering
+        Repositorio inicial con estructura de proyecto y primeros commits semánticos
+    \end{darkbox}
+\end{frame}
+
+\begin{frame}{Módulo 2: Colaboración (Semanas 4-6)}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.3\textwidth}
+            \centering
+            
+            \circled{4}
+            
+            \textbf{Semana 4}
+            
+            {\small\color{gludOrange} Branching}
+            
+            \vspace{0.2cm}
+            
+            {\tiny
+            \begin{itemize}
+                \item Concepto de ramas
+                \item Punteros y referencias
+                \item \texttt{feature/*} branches
+                \item Por qué no usar \texttt{main}
+            \end{itemize}
+            }
+        \end{column}
+        \begin{column}{0.3\textwidth}
+            \centering
+            
+            \circled{5}
+            
+            \textbf{Semana 5}
+            
+            {\small\color{gludOrange} Conflictos}
+            
+            \vspace{0.2cm}
+            
+            {\tiny
+            \begin{itemize}
+                \item Merge vs Rebase
+                \item Resolución de conflictos
+                \item \textbf{Laboratorio de Caos}
+                \item Estrategias de fusión
+            \end{itemize}
+            }
+        \end{column}
+        \begin{column}{0.3\textwidth}
+            \centering
+            
+            \circled{6}
+            
+            \textbf{Semana 6}
+            
+            {\small\color{gludOrange} Trabajo Remoto}
+            
+            \vspace{0.2cm}
+            
+            {\tiny
+            \begin{itemize}
+                \item Autenticación SSH
+                \item GitHub/GitLab
+                \item Clone, Push, Pull
+                \item Git Flow completo
+            \end{itemize}
+            }
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    \pause
+    
+    \begin{darkbox}[Hito Importante]
+        \centering
+        Equipos formados, roles asignados, proyecto colaborativo en marcha
+    \end{darkbox}
+\end{frame}
+
+\begin{frame}{Módulo 3: Calidad (Semanas 7-8)}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \centering
+            
+            \circled{7}
+            
+            \textbf{Semana 7}
+            
+            {\small\color{gludOrange} Code Review}
+            
+            \vspace{0.3cm}
+            
+            {\small
+            \begin{itemize}
+                \item Pull Requests (PR)
+                \item Revisión de código
+                \item Aprobaciones
+                \item Rol de Tech Lead
+            \end{itemize}
+            }
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \centering
+            
+            \circled{8}
+            
+            \textbf{Semana 8}
+            
+            {\small\color{gludOrange} Project Management}
+            
+            \vspace{0.3cm}
+            
+            {\small
+            \begin{itemize}
+                \item Issues y Labels
+                \item Milestones
+                \item Tableros Kanban
+                \item Vinculación con commits
+            \end{itemize}
+            }
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    \pause
+    
+    \begin{darkbox}[Entrega Parcial 2]
+        \centering
+        Demo intermedia: proyecto con PRs documentados y gestión de Issues
+    \end{darkbox}
+\end{frame}
+
+\begin{frame}{Módulo 4: Automatización (Semanas 9-10)}
+    \vspace{0.3cm}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \centering
+            
+            \circled{9}
+            
+            \textbf{Semana 9}
+            
+            {\small\color{gludOrange} CI - Integración Continua}
+            
+            \vspace{0.3cm}
+            
+            {\small
+            \begin{itemize}
+                \item ¿Qué es un Pipeline?
+                \item Estructura YAML
+                \item GitHub Actions / GitLab CI
+                \item Automatizar tests
+                \item Bloqueo de PRs fallidos
+            \end{itemize}
+            }
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \centering
+            
+            \circled{10}
+            
+            \textbf{Semana 10}
+            
+            {\small\color{gludOrange} CD - Despliegue Continuo}
+            
+            \vspace{0.3cm}
+            
+            {\small
+            \begin{itemize}
+                \item Generación de artifacts
+                \item Publicación en Releases
+                \item Tags y versiones
+                \item \textbf{Proyecto Final}
+                \item Auditoría GLUD
+            \end{itemize}
+            }
+        \end{column}
+    \end{columns}
+
+    \pause
+    
+    \begin{orangebox}[Entrega Final]
+        \centering
+        {\large\bfseries Repositorio auditado con pipeline CI/CD funcional}
+    \end{orangebox}
+\end{frame}
+
+
+% SECTION 4: METODOLOGÍA
+
+\section{Metodología}
+
+\begin{frame}{¿Cómo funcionará el curso?}
+    
+    \begin{orangebox}[Simulación de Entorno Laboral]
+        Este NO es un curso tradicional. Es una experiencia práctica simulando una empresa real.
+    \end{orangebox}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{Equipos de 3 personas:}
+            \begin{itemize}
+                \item Roles rotativos semanales
+                \item \textbf{Tech Lead:} Revisa y aprueba código
+                \item \textbf{Developers:} Implementan features
+            \end{itemize}
+            
+            \vspace{0.3cm}
+            
+            \textbf{Cada sesión:}
+            \begin{itemize}
+                \item 30-50 min teoría
+                \item 60-70 min práctica
+                \item Trabajo colaborativo en tiempo real
+                \item Resolución inmediata de dudas
+            \end{itemize}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \textbf{Proyecto colaborativo:}
+            \begin{itemize}
+                \item Stack tecnológico a elección
+                \item Desarrollo incremental
+                \item Entregas parciales
+                \item Pipeline CI/CD funcional
+            \end{itemize}
+            
+            \vspace{0.3cm}
+            
+            \textbf{Apoyo del GLUD:}
+            \begin{itemize}
+                \item Plantillas base
+                \item Auditoría final
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Stack Tecnológico Flexible}
+    
+    \begin{orangebox}[Agnóstico del Lenguaje]
+        Puedes usar el lenguaje que prefieras. El curso se adapta a tu stack.
+    \end{orangebox}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{Sugerencia inicial:}
+            
+            \vspace{0.2cm}
+            
+            \begin{darkbox}[Java + Maven]
+                \centering
+                {\small
+                Java JDK 17+ \\
+                Apache Maven \\
+                }
+                {\tiny
+                \begin{itemize}
+                    \item Fácil integración CI/CD
+                    \item Comandos estándar (\texttt{mvn test})
+                    \item Ecosistema maduro
+                \end{itemize}
+                }
+            \end{darkbox}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \textbf{Otras opciones válidas:}
+            
+            \vspace{0.2cm}
+            
+            {\small
+            \begin{itemize}
+                \item \textbf{Python} + pytest/unittest
+                \item \textbf{JavaScript/TypeScript} + npm/Jest
+                \item \textbf{C++} + CMake/Google Test
+                \item \textbf{C\#} + .NET
+                \item Cualquier lenguaje con tests automatizables
+            \end{itemize}
+            }
+            
+            \vspace{0.3cm}
+            
+            {\color{gludOrangeLight} Lo importante es que tenga build tool y testing framework}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% SECTION 5: RECURSOS
+
+\section{Recursos y Apoyo}
+
+\begin{frame}{¿Qué recursos tendrás?}
+    
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{Material del GLUD:}
+            \begin{itemize}
+                \item Slides de cada clase
+                \item Plantillas de proyectos
+                \item Guías de configuración
+                \item Templates de CI/CD
+                \item Ejemplos de buenas prácticas
+                \item Cheatsheets de comandos
+            \end{itemize}
+            
+            \vspace{0.3cm}
+            
+            \textbf{Plataformas:}
+            \begin{itemize}
+                \item GitHub/GitLab (hosting)
+                \item Git Bash/Terminal
+                \item VS Code (recomendado)
+            \end{itemize}
+        \end{column}
+        \pause
+        \begin{column}{0.48\textwidth}
+            \textbf{Documentación oficial:}
+            \begin{itemize}
+                \item \url{git-scm.com/doc}
+                \item GitHub Learning Lab
+                \item GitLab Documentation
+                \item Atlassian Git Tutorials
+            \end{itemize}
+            
+            
+            \textbf{Práctica interactiva:}
+            \begin{itemize}
+                \item \url{learngitbranching.js.org}
+                \item Git Immersion
+                \item GitHub Skills
+            \end{itemize}
+            
+            \textbf{Apoyo continuo:}
+            \begin{itemize}
+                \item Comunidad del curso
+                \item Sesiones de Q\&A
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Formación de Equipos}
+    
+    \begin{orangebox}[Próximo Paso]
+        Al final de esta sesión formaremos los equipos de 3 personas.
+    \end{orangebox}
+    
+    \step{1}{Considera tus fortalezas y debilidades}
+    
+    \step{2}{Busca complementariedad en tu equipo}
+    
+    \step{3}{Acuerden stack tecnológico (sugerencia: Java + Maven)}
+    
+    \step{4}{Definan canales de comunicación}
+    
+    \pause
+    
+    \centering
+    
+    \begin{darkbox}
+        \centering
+        El éxito del proyecto depende del \textbf{trabajo en equipo}, no solo de habilidades individuales
+    \end{darkbox}
+\end{frame}
+
+\section{Preparación para la Próxima Clase}
+
+\begin{frame}{Recomendaciones Antes de la Clase 1}
+    \vspace{0.3cm}
+    
+    \begin{orangebox}[Tareas antes de Clase 1]
+        Para aprovechar al máximo la siguiente sesión:
+    \end{orangebox}
+    
+    \vspace{0.4cm}
+    
+    \begin{itemize}
+        \item[$\square$] Formar equipo de 3 personas
+        
+        \vspace{0.2cm}
+        
+        \item[$\square$] Decidir stack tecnológico (Java + Maven recomendado)
+        
+        \vspace{0.2cm}
+        
+        \item[$\square$] Crear cuenta en GitHub o GitLab
+        
+        \vspace{0.2cm}
+        
+        \item[$\square$] (Opcional y recomendado) Traer computador con Linux instalado
+        
+        \vspace{0.2cm}
+        
+        \item[$\square$] (Opcional) Explorar \url{learngitbranching.js.org}
+        
+        \vspace{0.2cm}
+        
+        \item[$\square$] Leer el Syllabus completo
+    \end{itemize}
+    
+    \vspace{0.4cm}
+    
+    \centering
+    {\color{gludLightGray} La Clase 1 será 100\% práctica instalando herramientas}
+\end{frame}
+
+
+% Next class slide
+
+\begin{frame}[plain]
+\setbeamercolor{background canvas}{bg=gludPeach}
+\vspace{1.5cm}
+\centering
+
+{\Huge\color{gludOrange}\bfseries Clase 1}
+
+\vspace{0.5cm}
+
+{\Large\color{gludDark} Configuración del Entorno}
+
+\vspace{1cm}
+
+{\large\color{gludWhite} Instalación de Git + herramientas del stack. Variables de entorno. Arquitectura de Git. Primer \texttt{git init}.}
+
+\vspace{0.5cm}
+
+{\normalsize\color{gludLightGray} ¡Trae tu computador listo para trabajar!}
+\end{frame}
+\end{document}
