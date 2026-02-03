@@ -8,11 +8,12 @@ jobs:
       - name: Checkout del código
         uses: actions/checkout@v4
 
-      - name: Compilar archivos LaTeX
+      - name: Compilar todos los archivos .tex
         uses: xu-cheng/latex-action@v3
         with:
-          root_file: "**/*.tex"
-          compiler: pdflatex
+          root_file: "*.tex"
+          glob_root_file: true
+          work_in_root_file_dir: true
 
       - name: Subir PDFs generados
         uses: actions/upload-artifact@v4
