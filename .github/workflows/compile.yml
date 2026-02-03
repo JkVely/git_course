@@ -1,0 +1,23 @@
+name: Compilar Diapositivas
+on: [push]
+
+jobs:
+  build_latex:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Compilar archivos LaTeX
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: "**/*.tex"
+          glob_root_file: true
+          compiler: pdflatex
+          latexmk_use_xelatex: true
+
+      - name: Subir PDFs generados
+        uses: actions/upload-artifact@v4
+        with:
+          name: diapositivas-pdf
+          path: "**/*.pdf"
