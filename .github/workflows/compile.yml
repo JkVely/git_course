@@ -24,10 +24,17 @@ jobs:
       - name: Preparar PDFs para release
         run: |
           mkdir -p release
-          find . -name "*.pdf" -exec cp {} release/ \;
+          find . -name "*.pdf" ! -name "*diploma*" ! -name "*Diploma*" -exec cp {} release/ \;
 
       - name: Crear Release con PDFs
         uses: softprops/action-gh-release@v2
         with:
           files: release/*.pdf
-          generate_release_notes: true
+          body: |
+            ## 📚 Diapositivas del Curso de Git
+            
+            Descarga las presentaciones en PDF de cada clase.
+            
+            ### Contenido:
+            - Clases teóricas y prácticas
+            - Syllabus del curso
