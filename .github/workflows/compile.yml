@@ -24,7 +24,7 @@ jobs:
       - name: Preparar PDFs para release
         run: |
           mkdir -p release
-          find . -name "*.pdf" ! -name "*diploma*" ! -name "*Diploma*" -exec cp {} release/ \;
+          find . -name "*.pdf" ! -name "*diploma*" ! -name "diploma-git-github.pdf" -exec cp {} release/ \;
 
       - name: Crear Release con PDFs
         uses: softprops/action-gh-release@v2
