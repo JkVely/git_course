@@ -1,6 +1,6 @@
 <div align="center">
 
-![Banner](https://tse4.mm.bing.net/th/id/OIP.uvIC2IiYbc-IIqTF-f5RUQHaED?rs=1&pid=ImgDetMain&o=7&rm=3)
+![Banner](https://img.freepik.com/fotos-premium/lindo-animalito-bonito-retrato-leon-azul-toque-ilustracion-acuarela_169356-321.jpg?w=2000)
 
 # Ingeniería de Software Colaborativa
 ## Git y CI/CD
