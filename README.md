@@ -1,6 +1,6 @@
 <div align="center">
 
-![Banner](https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?w=1200&h=300&fit=crop)
+![Banner](https://tse4.mm.bing.net/th/id/OIP.uvIC2IiYbc-IIqTF-f5RUQHaED?rs=1&pid=ImgDetMain&o=7&rm=3)
 
 # Ingeniería de Software Colaborativa
 ## Git y CI/CD
