@@ -47,6 +47,8 @@
 *.idx
 *.ilg
 *.ind
+*.listing
+*.vrb
 
 ## OS generated files:
 .DS_Store

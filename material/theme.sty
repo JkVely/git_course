@@ -12,15 +12,18 @@
 
 \RequirePackage[utf8]{inputenc}
 \RequirePackage[T1]{fontenc}
+\RequirePackage{lmodern}
+\RequirePackage{fontawesome5}
 \RequirePackage{tikz}
 \RequirePackage{amsmath}
 \RequirePackage{pifont}
 \RequirePackage{graphicx}
 \RequirePackage{xcolor}
+\RequirePackage{listings}
 \RequirePackage{tcolorbox}
-\tcbuselibrary{skins,breakable}
+\tcbuselibrary{skins,breakable,listings}
 \usetikzlibrary{calc}
-
+\RequirePackage[table]{xcolor}
 
 \definecolor{gludDark}{HTML}{2B3A42}        % Dark blue-gray background
 \definecolor{gludDarker}{HTML}{1A252B}      % Darker shade
@@ -131,6 +134,54 @@
     title=#1
 }
 
+% YAML code box (syntax-highlighted, no shell-escape required)
+\lstdefinelanguage{yaml}{
+    keywords={true,false,null,y,n,yes,no,on,off},
+    keywordstyle=\color{gludOrange}\bfseries,
+    basicstyle=\ttfamily\small\color{gludWhite},
+    sensitive=false,
+    comment=[l]{\#},
+    commentstyle=\color{gludLightGray}\itshape,
+    stringstyle=\color{gludPeach},
+    moredelim=[l][\color{gludOrangeLight}]{\&},
+    moredelim=[l][\color{gludOrangeLight}]{*},
+    moredelim=**[il][\color{gludOrange}]{:},
+    morestring=[b]',
+    morestring=[b]"
+}
+
+\lstdefinestyle{gludyaml}{
+    language=yaml,
+    basicstyle=\ttfamily\small\color{gludWhite},
+    keywordstyle=\color{gludOrange}\bfseries,
+    commentstyle=\itshape\color{gludLightGray},
+    stringstyle=\color{gludPeach},
+    showstringspaces=false,
+    breaklines=true,
+    keepspaces=true,
+    columns=fullflexible,
+    upquote=true,
+    extendedchars=true,
+    literate=
+     {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+     {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+     {ñ}{{\~n}}1 {Ñ}{{\~N}}1
+}
+
+\newtcblisting{yamlcodebox}[1][]{
+    listing only,
+    listing engine=listings,
+    listing options={style=gludyaml},
+    colback=gludDarker,
+    colframe=gludOrange,
+    coltitle=gludWhite,
+    fonttitle=\bfseries\ttfamily,
+    boxrule=1pt,
+    arc=0pt,
+    left=8pt, right=8pt, top=6pt, bottom=6pt,
+    title=#1
+}
+
 % Warning/alert box
 \newtcolorbox{alertbox}[1][]{
     colback=gludOrange!30,
@@ -153,6 +204,11 @@
 
 % Orange bullet point
 \newcommand{\orangebullet}{\textcolor{gludOrange}{\textbullet}}
+
+% Brand icons for platform mentions
+\newcommand{\githubicon}{\textcolor{gludWhite}{\faGithub}}
+\newcommand{\gitlabicon}{\textcolor{gludOrangeLight}{\faGitlab}}
+\newcommand{\linuxicon}{\textcolor{gludWhite}{\faLinux}}
 
 % Circled letter/number (for steps, options A/B/C)
 \newcommand{\circled}[1]{%
@@ -407,6 +463,26 @@
             {\small\color{gludLightGray}#4}
         \end{column}
     \end{columns}
+}
+
+% Exact 50/50 comparison layout
+% Usage:
+% \begin{comparebox}
+%   Left content
+%   \comparebreak
+%   Right content
+% \end{comparebox}
+\newenvironment{comparebox}{%
+    \begin{columns}[T,onlytextwidth]
+        \begin{column}{0.5\textwidth}
+}{%
+        \end{column}
+    \end{columns}
+}
+
+\newcommand{\comparebreak}{%
+    \end{column}
+    \begin{column}{0.5\textwidth}
 }
 
 
