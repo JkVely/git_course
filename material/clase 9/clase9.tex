@@ -1,0 +1,327 @@
+\documentclass[aspectratio=169]{beamer}
+\makeatletter
+\def\input@path{{../}}
+\makeatother
+\usepackage{theme} % Tu STY severo
+\usepackage[table]{xcolor} 
+\usepackage{fontawesome5} % Para los iconos de Github, Gitlab y Linux
+\usepackage{listings}
+
+% --- FIX PARA YAML Y LOS DOS PUNTOS ---
+\lstdefinelanguage{YAML}{
+  keywords={true,false,null,y,n},
+  keywordstyle=\color{gludOrange}\bfseries,
+  basicstyle=\color{gludWhite}\ttfamily\small,
+  commentstyle=\color{gludLightGray}\itshape,
+  stringstyle=\color{gludOrangeLight},
+  moredelim=[l][\color{gludOrange}]{\&},
+  moredelim=[l][\color{gludOrangeLight}]{\*},
+  morestring=[b]',
+  morestring=[b]",
+  literate={:}{{\textcolor{gludOrangeLight}{:}}}1 % El fix mágico para los dos puntos
+           {-}{{\textcolor{gludOrange}{-}}}1,
+}
+
+\lstnewenvironment{yamlcode}{
+  \lstset{
+    language=YAML,
+    breaklines=true,
+    breakatwhitespace=true,
+    frame=none,
+    backgroundcolor=\color{gludDarker},
+    xleftmargin=10pt,
+    aboveskip=0pt,
+    belowskip=0pt
+  }
+}{}
+
+% Metadatos
+\title{Integración Continua (CI)}
+\subtitle{Semana 9 - Automatización en la vida real}
+\author{Juan Carlos Quintero Rubiano (JkVely)}
+\date{Noviembre 2025}
+
+\begin{document}
+
+% 1. Portada
+\titleframe[Curso Git 101 - GLUD]
+
+% 2. Índice
+\contentsframe
+
+% ==========================================
+\section{El concepto de CI}
+% ==========================================
+
+\begin{frame}{¿Qué es Integración Continua?}
+    \begin{orangebox}[Definición Práctica]
+        Es la práctica de subir código a un repositorio compartido (como GitHub o GitLab) \highlight{varias veces al día}. Cada vez que subes algo, un servidor revisa automáticamente si tu código sirve o si acabas de romper el proyecto.
+    \end{orangebox}
+
+    \vspace{0.3cm}
+    \textbf{¿Qué podemos hacer con CI?}
+    \begin{itemize}
+        \item Compilar el código (asegurar que no hay errores de sintaxis).
+        \item Correr pruebas automáticas.
+        \item Revisar el estilo del código (Linting).
+        \item Auditar vulnerabilidades de seguridad en librerías.
+    \end{itemize}
+\end{frame}
+
+% ==========================================
+\section{Tipos de Pruebas}
+% ==========================================
+
+\begin{frame}{Pruebas Unitarias (Unit Tests)}
+    Son la primera línea de defensa de tu código.
+    
+    \vspace{0.3cm}
+    \begin{darkbox}[Características]
+        \begin{itemize}
+            \item Prueban una sola función o clase de manera aislada.
+            \item Son \highlight{extremadamente rápidas} (milisegundos).
+            \item No usan bases de datos, ni red, ni archivos externos.
+        \end{itemize}
+    \end{darkbox}
+    
+    \vspace{0.3cm}
+    \textbf{Ejemplo:} Validar que la función que calcula el IVA en tu carrito de compras devuelva el valor correcto si le pasas $\$100.000$.
+\end{frame}
+
+\begin{frame}{Pruebas de Integración}
+    Revisan que los bloques de tu sistema se hablen bien entre ellos.
+    
+    \vspace{0.3cm}
+    \begin{alertbox}[Características]
+        \begin{itemize}
+            \item {\color{black}Prueban el conjunto: Tu código + Base de datos + APIs.}
+            \item {\color{black}Son más lentas y costosas de ejecutar.}
+            \item {\color{black}Requieren preparar un entorno (ej. levantar contenedores).}
+        \end{itemize}
+    \end{alertbox}
+    
+    \vspace{0.3cm}
+    \textbf{Ejemplo:} Validar que al registrar un usuario en la página, sus datos efectivamente queden guardados en las tablas de PostgreSQL.
+\end{frame}
+
+% ==========================================
+% EJEMPLOS PRÁCTICOS DE CÓDIGO
+% ==========================================
+
+\begin{frame}[fragile]{Ejemplo: Prueba Unitaria (Java con JUnit)}
+    \begin{darkbox}[Contexto: Servicio de Facturaci\'on]
+        Probando \textbf{solo} la l\'ogica matem\'atica en memoria, sin tocar la base de datos ni levantar servidores. !Se ejecuta en milisegundos!
+    \end{darkbox}
+
+\end{frame}
+\begin{frame}[fragile]{Ejemplo: Prueba Unitaria (Java con JUnit)}
+    
+    \vspace{-0.4cm}
+    \begin{codebox}[CalculadoraIvaTest.java]
+\begin{lstlisting}[language=Java, basicstyle=\color{gludWhite}\ttfamily\scriptsize, keywordstyle=\color{gludOrange}\bfseries, stringstyle=\color{gludOrangeLight}, commentstyle=\color{gludLightGray}\itshape, backgroundcolor=\color{gludDarker}]
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+class CalculadoraIvaTest {
+    @Test
+    void calcularIva_DebeRetornarEl19Porciento() {
+        // Arrange (Preparar datos)
+        CalculadoraIva calc = new CalculadoraIva();
+        double montoBase = 100000.0;
+        // Act (Ejecutar la funcion aislada)
+        double resultado = calc.calcularIva(montoBase);
+        // Assert (Verificar que el resultado es el esperado)
+        assertEquals(19000.0, resultado);
+    }
+}
+\end{lstlisting}
+    \end{codebox}
+\end{frame}
+
+\begin{frame}[fragile]{Ejemplo: Prueba de Integraci\'on}
+    \begin{alertbox}[Contexto: Dashboard de Usuarios]
+        Aqu\'i probamos el flujo completo: El navegador renderiza Astro $\rightarrow$ Astro hace fetch a la API $\rightarrow$ La API consulta PostgreSQL.
+    \end{alertbox}
+\end{frame}
+\begin{frame}[fragile]{Ejemplo: Prueba de Integraci\'on}
+    \vspace{-0.4cm}
+    \begin{codebox}[usuarios.spec.ts (TypeScript)]
+\begin{lstlisting}[language=Java, basicstyle=\color{gludWhite}\ttfamily\scriptsize, keywordstyle=\color{gludOrange}\bfseries, stringstyle=\color{gludOrangeLight}, commentstyle=\color{gludLightGray}\itshape, backgroundcolor=\color{gludDarker}]
+import { test, expect } from '@playwright/test';
+
+test("Debe cargar la lista de usuarios de la BD", async ({ page }) => {
+  // 1. Navegar a la ruta de Astro que hace el SSR (Server Side Rendering)
+  await page.goto('http://localhost:4321/usuarios');
+
+  // 2. Esperar que la tabla del DOM se renderice
+  const tabla = page.locator('table.usuarios-list');
+  await expect(tabla).toBeVisible();
+
+    // 3. Validar que la base de datos devolvio el usuario de prueba
+  const nombreUsuario = page.getByText('Juan Perez');
+  await expect(nombreUsuario).toBeVisible(); 
+    // Si la BD esta caida, esto falla y el CI detiene el pase a produccion
+});
+\end{lstlisting}
+    \end{codebox}
+\end{frame}
+
+% ==========================================
+\section{Arquitectura YAML}
+% ==========================================
+
+\begin{frame}{YAML: El idioma del DevOps}
+    \begin{orangebox}[YAML Ain't Markup Language]
+        Es un formato súper ligero y legible. Olvídense del XML; YAML es el estándar absoluto para GitHub Actions, GitLab CI, Kubernetes y Ansible.
+    \end{orangebox}
+    
+    \vspace{0.5cm}
+    \textbf{Reglas de oro que te salvarán la vida:}
+    \begin{itemize}
+        \item \highlight{La indentación es la ley:} Usa espacios, \textbf{NUNCA TABS}.
+        \item Las listas llevan un guion (\inlinecode{-}).
+        \item Los diccionarios (pares) van separados por dos puntos (\inlinecode{:}).
+        \item Si indentas mal un espacio, el pipeline explota.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Anatomía de un Pipeline}
+    Todo pipeline, sin importar la herramienta, tiene estas partes:
+    
+    \vspace{0.3cm}
+    \begin{itemize}
+        \item \step{1}{Triggers:} ¿Qué dispara la acción? (\inlinecode{push}, \inlinecode{pull\_request}, horario).
+        \item \step{2}{Runners:} La máquina virtual o contenedor que ejecutará el proceso (Ej: \inlinecode{ubuntu-latest}).
+        \item \step{3}{Jobs:} Un grupo de tareas que se ejecutan en un mismo Runner.
+        \item \step{4}{Steps:} Los comandos paso a paso (ej. instalar paquetes, compilar, testear).
+    \end{itemize}
+\end{frame}
+
+% ==========================================
+\section{Ecosistema GitHub Actions}
+% ==========================================
+
+\begin{frame}[fragile]{\faGithub\ Actions: Triggers y Jobs}
+    \begin{codebox}[1. Estructura base (.github/workflows/main.yml)]
+\begin{yamlcode}
+name: Backend CI
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  construir-y-probar:
+    runs-on: ubuntu-latest
+\end{yamlcode}
+    \end{codebox}
+\end{frame}
+
+\begin{frame}[fragile]{\faGithub\ Actions: Steps y Actions}
+    \begin{codebox}[2. Definiendo los pasos]
+\begin{yamlcode}
+    steps:
+      - name: 1. Traer el codigo al servidor
+        uses: actions/checkout@v4
+    
+      - name: 2. Preparar Java 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: '17'
+
+      - name: 3. Ejecutar Maven
+        run: mvn clean package
+\end{yamlcode}
+\end{codebox}
+\end{frame}
+
+\begin{frame}{\faGithub\ Las Actions más útiles de la comunidad}
+    No reinventen la rueda. Ya hay "plugins" listos para usar:
+    
+    \vspace{0.3cm}
+    \begin{itemize}
+        \item \highlight{\inlinecode{actions/checkout@v4}}: Obligatoria. Clona tu repo en la máquina virtual. Sin esto, el runner está vacío.
+        \item \highlight{\inlinecode{actions/setup-node}} o \highlight{\inlinecode{setup-java}}: Instalan y configuran el lenguaje de programación y la caché de dependencias.
+        \item \highlight{\inlinecode{actions/upload-artifact@v4}}: Saca archivos de la máquina virtual (ej. un \inlinecode{.jar} compilado o un PDF) y los deja descargables en GitHub.
+        \item \highlight{\inlinecode{docker/login-action}}: Se autentica en Docker Hub para subir imágenes.
+    \end{itemize}
+\end{frame}
+
+% ==========================================
+\section{Ecosistema GitLab CI}
+% ==========================================
+
+\begin{frame}[fragile]{\faGitlab\ GitLab CI: Enfoque en contenedores}
+    Todo vive en un solo archivo \inlinecode{.gitlab-ci.yml}. Est\'a dise\~nado alrededor de \faLinux\ Docker.
+    
+    \begin{codebox}[Estructura base - GitLab CI]
+\begin{yamlcode}
+image: maven:3.8.5-openjdk-17 # La imagen base de Docker
+
+stages:
+  - test
+  - build
+
+correr_pruebas:
+  stage: test
+  script:
+    - mvn test
+\end{yamlcode}
+    \end{codebox}
+\end{frame}
+
+% ==========================================
+\section{Aplicación Real (GitFlow)}
+% ==========================================
+
+\begin{frame}{CI aplicado a GitFlow (El mundo real)}
+    ¿Cómo se ve esto en una empresa desarrollando en Spring Boot?
+    
+    \vspace{0.4cm}
+    \begin{itemize}
+        \item \step{1}{Rama \inlinecode{feature/*}:} Haces commit. El CI corre el linter y \highlight{Pruebas Unitarias}. Es un proceso rápido que verifica tu lógica básica.
+        \item \step{2}{Merge Request a \inlinecode{develop}:} El CI levanta un contenedor de PostgreSQL, arranca tu contexto de Spring y corre \highlight{Pruebas de Integración}. Valida que la base de datos se comunica bien.
+        \item \step{3}{Merge a \inlinecode{main}:} Todo está en verde. El CI compila el código, genera el \inlinecode{.jar}, crea una imagen de Docker y la sube al registry.
+    \end{itemize}
+\end{frame}
+
+% ==========================================
+\section{Comparativa Final}
+% ==========================================
+
+\begin{frame}{Comparativa directa: \faGithub\ vs \faGitlab}
+    \vspace{-0.7cm}
+    \begin{comparebox}
+        \begin{darkbox}[\faGithub\ GitHub Actions]
+            \begin{itemize}
+                \item \textbf{Config:} \inlinecode{.github/workflows/*.yml}
+                \item \textbf{Reusabilidad:} Marketplace de "Actions".
+                \item \textbf{Enfoque:} Orientado a eventos.
+                \item \textbf{Curva:} Rápida e intuitiva.
+            \end{itemize}
+        \end{darkbox}
+    \comparebreak
+        \begin{darkbox}[\faGitlab\ GitLab CI]
+            \begin{itemize}
+                \item \textbf{Config:} \inlinecode{.gitlab-ci.yml}
+                \item \textbf{Reusabilidad:} Plantillas y scripts puros.
+                \item \textbf{Enfoque:} Contenedores Docker nativos.
+                \item \textbf{Curva:} Más exigente en bash.
+            \end{itemize}
+        \end{darkbox}
+    \end{comparebox}
+    \begin{alertbox}[Conclusión]
+    Para sus proyectos, \faGithub\ Actions es más amigable y rápido. \faGitlab\ CI es la herramienta corporativa por excelencia.
+    \end{alertbox}
+\end{frame}
+
+% ==========================================
+\section{Cierre y Manos a la obra}
+% ==========================================
+
+\quoteslide{Si tienes que hacer la misma tarea en la terminal más de tres veces a la semana, deberías haberla automatizado en tu CI/CD.}{Ley de la pereza del DevOps}
+
+\thankslide{Gracias\\{\hspace*{1cm}\Large¡A romper producción! (Pero en el CI)}}
+
+\end{document}
