@@ -1,0 +1,477 @@
+\documentclass[aspectratio=169]{beamer}
+\makeatletter
+\def\input@path{{../}}
+\makeatother
+\usepackage{theme}
+\usepackage[table]{xcolor}
+\usepackage{fontawesome5}
+
+% Metadatos
+\title{Continuous Deployment (CD)}
+\subtitle{Semana 10 - Cierre del curso Git y CI/CD}
+\author{Juan Carlos Quintero Rubiano (JkVely)}
+\date{Noviembre 2025}
+
+\begin{document}
+
+% 1. Portada
+\titleframe[Curso Git 101 - GLUD]
+
+% 2. Indice
+\contentsframe
+
+% ==========================================
+\section{Que es CD y por que importa}
+% ==========================================
+
+\begin{frame}{De CI a CD: el paso que faltaba}
+	\begin{orangebox}[Definicion rapida]
+		\textbf{CI (Continuous Integration):} integra cambios pequenos con pruebas automaticas en cada push o merge request.\\
+		\textbf{CD (Continuous Delivery / Deployment):} toma ese codigo validado y lo lleva a entornos reales de forma repetible y segura.
+	\end{orangebox}
+
+	\vspace{0.35cm}
+	\textbf{Idea clave de esta clase:}
+	\begin{itemize}
+		\item CI valida calidad tecnica.
+		\item CD reduce tiempo entre "codigo listo" y "valor en produccion".
+		\item Sin CD, cada release termina siendo manual, lenta y riesgosa.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{C Delivery vs C Deployment}
+	\begin{comparebox}
+		\begin{darkbox}[Continuous Delivery]
+			\begin{itemize}
+				\item El pipeline deja un artefacto \highlight{listo para produccion}.
+				\item El despliegue final suele requerir \highlight{aprobacion manual}.
+			\end{itemize}
+		\end{darkbox}
+	\comparebreak
+		\begin{darkbox}[Continuous Deployment]
+			\begin{itemize}
+				\item Si pruebas y reglas pasan, \highlight{se despliega solo}.
+				\item Requiere observabilidad y rollback maduros.
+			\end{itemize}
+		\end{darkbox}
+	\end{comparebox}
+
+	\begin{alertbox}[Regla practica]
+		No empiecen por "desplegar todo automatico". Primero estabilicen pruebas, seguridad y monitoreo.
+	\end{alertbox}
+\end{frame}
+
+\begin{frame}{Pipeline minimo para CD}
+	\begin{itemize}
+		\item \step{1}{Build:} compilar, instalar dependencias, empaquetar.
+		\item \step{2}{Test:} unitarias + integracion + smoke tests.
+		\item \step{3}{Quality Gate:} analisis de codigo y vulnerabilidades.
+		\item \step{4}{Artifact:} generar imagen Docker o paquete versionado.
+		\item \step{5}{Deploy:} staging y luego produccion con estrategia definida.
+		\item \step{6}{Observe:} metricas, logs, alertas y rollback si falla.
+	\end{itemize}
+	\begin{orangebox}[Meta DevOps]
+		Desplegar debe ser una \highlight{operacion de rutina}, no un evento de estres.
+	\end{orangebox}
+\end{frame}
+
+% ==========================================
+\section{Tipos de despliegue}
+% ==========================================
+
+\begin{frame}{Estrategias de despliegue mas usadas}
+	\begin{comparebox}
+		\begin{darkbox}[Estrategias directas]
+			\begin{itemize}
+				\item \textbf{Recreate:} apagar version vieja y subir nueva.
+				\item \textbf{Rolling:} reemplazo gradual por lotes.
+				\item \textbf{Blue/Green:} dos entornos; cambias trafico al nuevo.
+			\end{itemize}
+		\end{darkbox}
+	\comparebreak
+		\begin{darkbox}[Estrategias avanzadas]
+			\begin{itemize}
+				\item \textbf{Canary:} liberar a un porcentaje pequeno de usuarios.
+				\item \textbf{Feature Flags:} activar funcionalidad sin redeploy.
+				\item \textbf{A/B Testing:} comparar variantes con metricas reales.
+			\end{itemize}
+		\end{darkbox}
+	\end{comparebox}
+\end{frame}
+
+\begin{frame}{Como elegir estrategia de despliegue}
+	\small
+	\renewcommand{\arraystretch}{1.25}
+	\begin{tabular}{|p{0.22\linewidth}|p{0.30\linewidth}|p{0.34\linewidth}|}
+		\hline
+		\rowcolor{gludOrangeDark!85}
+		\textbf{Estrategia} & \textbf{Cuando usarla} & \textbf{Riesgo / Costo} \\
+		\hline
+		Recreate & Apps internas o ventanas de mantenimiento & Riesgo alto de downtime, costo bajo \\
+		\hline
+		Rolling & Servicios con varias instancias & Riesgo medio, costo medio \\
+		\hline
+		Blue/Green & Sistemas criticos con necesidad de rollback rapido & Riesgo bajo, costo alto (doble entorno) \\
+		\hline
+		Canary & Producto con trafico alto y monitoreo fuerte & Riesgo bajo, operacion mas compleja \\
+		\hline
+	\end{tabular}
+
+	\vspace{0.1cm}
+	\begin{darkbox}[Tip de arquitectura]
+		Mientras mas fuerte sea su observabilidad, mas agresiva puede ser su automatizacion de despliegue.
+	\end{darkbox}
+\end{frame}
+
+\begin{frame}{Checklist antes de pasar a produccion}
+	\begin{itemize}
+		\item \textbf{Pruebas en verde:} unitarias, integracion y smoke test.
+		\item \textbf{Migraciones seguras:} scripts reversibles o compatibles.
+		\item \textbf{Versionado claro:} tags tipo \inlinecode{v1.4.0}.
+		\item \textbf{Plan de rollback:} definido y probado.
+		\item \textbf{Monitoreo activo:} dashboards y alertas configuradas.
+		\item \textbf{Canal de incidentes:} responsables y protocolo de respuesta.
+	\end{itemize}
+\end{frame}
+
+% ==========================================
+\section{CD en GitHub Actions}
+% ==========================================
+
+\begin{frame}{\faGithub\ GitHub Actions para despliegue continuo}
+	\begin{orangebox}[Puntos importantes]
+		GitHub Actions usa workflows en \inlinecode{.github/workflows/*.yml} y permite controlar despliegues con \highlight{environments}, secretos y reglas de proteccion.
+	\end{orangebox}
+
+	\vspace{0.3cm}
+	\textbf{Flujo recomendado:}
+	\begin{itemize}
+		\item Push a \inlinecode{develop} despliega a \inlinecode{staging}.
+		\item Tag \inlinecode{v*} despliega a \inlinecode{production}.
+		\item Requerir reviewers para entorno de produccion.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{\faGithub\ Ejemplo CD: staging automatico}
+\begin{yamlcodebox}[Archivo: .github/workflows/cd-staging.yml]
+name: CD Staging
+on:
+  push:
+	branches: [develop]
+
+jobs:
+  build-test-deploy:
+	runs-on: ubuntu-latest
+	environment: staging
+	steps:
+	  - uses: actions/checkout@v4
+\end{yamlcodebox}
+\end{frame}
+\begin{frame}[fragile]{\faGithub\ Ejemplo CD: staging automatico (cont)}
+\begin{yamlcodebox}[Archivo: .github/workflows/cd-staging.yml]
+	  - uses: actions/setup-java@v4
+		with:
+		  distribution: temurin
+		  java-version: '21'
+	  - name: Build + Test
+		run: mvn -B clean verify
+	  - name: Build image
+		run: docker build -t app:${{ github.sha }} .
+	  - name: Deploy a staging
+		run: ./scripts/deploy-staging.sh
+\end{yamlcodebox}
+\end{frame}
+
+\begin{frame}[fragile]{\faGithub\ Ejemplo CD: produccion con tags}
+\begin{yamlcodebox}[Archivo: .github/workflows/cd-prod.yml]
+name: CD Production
+on:
+  push:
+	tags:
+	  - 'v*'
+
+jobs:
+  release:
+	runs-on: ubuntu-latest
+	environment: production
+\end{yamlcodebox}
+\end{frame}
+\begin{frame}[fragile]{\faGithub\ Ejemplo CD: produccion con tags (cont)}
+\begin{yamlcodebox}[Archivo: .github/workflows/cd-prod.yml]
+	steps:
+	  - uses: actions/checkout@v4
+	  - name: Publicar artefacto
+		run: ./scripts/publish-artifact.sh
+	  - name: Deploy blue-green
+		run: ./scripts/deploy-prod-bluegreen.sh
+\end{yamlcodebox}
+\end{frame}
+
+% ==========================================
+\section{CD en GitLab CI}
+% ==========================================
+
+\begin{frame}{\faGitlab\ GitLab CI para despliegues}
+	\begin{darkbox}[Modelo GitLab]
+		Todo se define en \inlinecode{.gitlab-ci.yml}. GitLab integra \highlight{stages}, \highlight{environments} y \highlight{protected branches/tags} para endurecer el paso a produccion.
+	\end{darkbox}
+
+	\vspace{0.35cm}
+	\textbf{Buenas practicas minimas:}
+	\begin{itemize}
+		\item Usar runners dedicados para deploy.
+		\item Separar jobs: \inlinecode{test}, \inlinecode{build}, \inlinecode{deploy}.
+		\item Marcar deploy a prod como \inlinecode{when: manual} al inicio.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{\faGitlab\ Ejemplo .gitlab-ci.yml para CD}
+\begin{yamlcodebox}[Archivo: .gitlab-ci.yml]
+stages:
+  - test
+  - package
+  - deploy
+
+test_app:
+  stage: test
+  image: maven:3.9-eclipse-temurin-21
+  script:
+	- mvn -B test
+\end{yamlcodebox}
+\end{frame}
+\begin{frame}[fragile]{\faGitlab\ Ejemplo .gitlab-ci.yml para CD (cont)}
+\begin{yamlcodebox}[Archivo: .gitlab-ci.yml]
+package_app:
+  stage: package
+  script:
+	- mvn -B clean package
+  artifacts:
+	paths:
+	  - target/*.jar
+\end{yamlcodebox}
+\end{frame}
+\begin{frame}[fragile]{\faGitlab\ Ejemplo .gitlab-ci.yml para CD (cont)}
+\begin{yamlcodebox}[Archivo: .gitlab-ci.yml]
+deploy_prod:
+  stage: deploy
+  environment: production
+  only:
+	- tags
+  when: manual
+  script:
+	- ./scripts/deploy-prod.sh
+\end{yamlcodebox}
+\end{frame}
+
+\begin{frame}{\faGithub\ vs \faGitlab\ para CD (resumen realista)}
+	\begin{comparebox}
+		\begin{darkbox}[GitHub Actions]
+			\begin{itemize}
+				\item Muy amigable para comenzar.
+				\item Gran marketplace de actions listas.
+				\item Excelente si el equipo ya vive en GitHub.
+			\end{itemize}
+		\end{darkbox}
+	\comparebreak
+		\begin{darkbox}[GitLab CI]
+			\begin{itemize}
+				\item Muy fuerte en pipelines corporativos.
+				\item Integracion robusta con runners privados.
+			\end{itemize}
+		\end{darkbox}
+	\end{comparebox}
+
+	\begin{alertbox}[Decision practica]
+		No hay "mejor absoluto". Elijan segun ecosistema, nivel de madurez y necesidades de seguridad.
+	\end{alertbox}
+\end{frame}
+
+% ==========================================
+\section{Cuestionario final}
+% ==========================================
+
+\begin{frame}{Modo evaluacion de cierre}
+	\begin{orangebox}[Como jugar este cuestionario]
+		12 preguntas de opcion multiple (A, B, C, D) para repasar \highlight{todo el temario} de semanas 1 a 9.
+	\end{orangebox}
+\end{frame}
+
+\begin{frame}{Quiz - Bloque 1}
+	\small
+	\textbf{1) Que comando crea un repositorio Git local desde cero?}
+	\begin{itemize}
+		\item A) \inlinecode{git init}
+		\item B) \inlinecode{git clone}
+		\item C) \inlinecode{git stage}
+		\item D) \inlinecode{git start}
+	\end{itemize}
+
+	\textbf{2) Que comando mueve cambios al area Staged?}
+	\begin{itemize}
+		\item A) \inlinecode{git commit}
+		\item B) \inlinecode{git add}
+		\item C) \inlinecode{git push}
+		\item D) \inlinecode{git tag}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Quiz - Bloque 2}
+	\small
+	\textbf{3) Que tipo de Conventional Commit se usa para corregir un bug?}
+	\begin{itemize}
+		\item A) \inlinecode{feat:}
+		\item B) \inlinecode{style:}
+		\item C) \inlinecode{fix:}
+		\item D) \inlinecode{chore:}
+	\end{itemize}
+
+	\textbf{4) Cual comando muestra un historial compacto y graficado?}
+	\begin{itemize}
+		\item A) \inlinecode{git status -v}
+		\item B) \inlinecode{git log --oneline --graph --decorate --all}
+		\item C) \inlinecode{git show origin/main}
+		\item D) \inlinecode{git diff --cached}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Quiz - Bloque 3}
+	\small
+	\textbf{5) En Git Flow, una nueva funcionalidad nace normalmente desde:}
+	\begin{itemize}
+		\item A) \inlinecode{hotfix/*}
+		\item B) \inlinecode{release/*}
+		\item C) \inlinecode{develop} en rama \inlinecode{feature/*}
+		\item D) \inlinecode{main} en rama \inlinecode{docs/*}
+	\end{itemize}
+
+	\textbf{6) Si quieres preservar el contexto de ramas al integrar cambios, usas:}
+	\begin{itemize}
+		\item A) \inlinecode{git rebase -i}
+		\item B) \inlinecode{git merge --no-ff}
+		\item C) \inlinecode{git reset --hard}
+		\item D) \inlinecode{git commit --amend}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Quiz - Bloque 4}
+	\small
+	\textbf{7) Primer push vinculando rama local con remota:}
+	\begin{itemize}
+		\item A) \inlinecode{git push origin}
+		\item B) \inlinecode{git push -u origin feature/login}
+		\item C) \inlinecode{git remote push feature/login}
+		\item D) \inlinecode{git upload branch}
+	\end{itemize}
+
+	\textbf{8) Buena practica antes de hacer merge de un PR/MR:}
+	\begin{itemize}
+		\item A) Merge directo sin revision
+		\item B) Permitir pipeline en rojo
+		\item C) Exigir review y checks en verde
+		\item D) Cerrar issue sin evidencia
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Quiz - Bloque 5}
+	\small
+	\textbf{9) Donde se guardan los workflows de GitHub Actions?}
+	\begin{itemize}
+		\item A) \inlinecode{Jenkinsfile}
+		\item B) \inlinecode{.github/workflows/*.yml}
+		\item C) \inlinecode{docker-compose.yml}
+		\item D) \inlinecode{.gitlab-ci.yml}
+	\end{itemize}
+
+	\textbf{10) En CI/CD, que es un runner?}
+	\begin{itemize}
+		\item A) Un plugin del IDE
+		\item B) Un bot de chat
+		\item C) Un agente/maquina que ejecuta jobs
+		\item D) Unicamente una base de datos
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Quiz - Bloque 6}
+	\small
+	\textbf{11) En Continuous Delivery, que parte suele quedar manual?}
+	\begin{itemize}
+		\item A) El deploy siempre automatico a produccion
+		\item B) La aprobacion final para desplegar
+		\item C) Solo compilar sin pruebas
+		\item D) Usar solo Kubernetes
+	\end{itemize}
+
+	\textbf{12) Ventaja principal de Blue/Green deployment:}
+	\begin{itemize}
+		\item A) Elimina toda necesidad de monitoreo
+		\item B) Costo siempre minimo
+		\item C) Rollback rapido al cambiar trafico
+		\item D) Funciona solo en GitLab
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Respuestas del cuestionario}
+	\small
+	\begin{columns}[T,onlytextwidth]
+		\begin{column}{0.49\textwidth}
+			\begin{enumerate}
+				\item A) \inlinecode{git init}
+				\item B) \inlinecode{git add}
+				\item C) \inlinecode{fix:}
+				\item B) \inlinecode{git log --oneline --graph --decorate --all}
+				\item C) \inlinecode{develop} en rama \inlinecode{feature/*}
+				\item B) \inlinecode{git merge --no-ff}
+			\end{enumerate}
+		\end{column}
+		\begin{column}{0.49\textwidth}
+			\begin{enumerate}
+				\setcounter{enumi}{6}
+				\item B) \inlinecode{git push -u origin feature/login}
+				\item C) Exigir review y checks en verde
+				\item B) \inlinecode{.github/workflows/*.yml}
+				\item C) Un agente/maquina que ejecuta jobs
+				\item B) La aprobacion final para desplegar
+				\item C) Rollback rapido al cambiar trafico
+			\end{enumerate}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+% ==========================================
+\section{Toolbox DevOps y cierre}
+% ==========================================
+
+\begin{frame}{Herramientas de cultura DevOps}
+	\small
+	\begin{itemize}
+		\item \highlight{Jenkins:} servidor de automatizacion. Ejecuta pipelines definidos en \inlinecode{Jenkinsfile} y orquesta build, test y deploy.
+		\item \highlight{SonarQube:} calidad y seguridad estatica. Analiza codigo, calcula deuda tecnica y aplica \inlinecode{quality gates}.
+		\item \highlight{Nexus/Artifactory:} repositorio de artefactos. Guarda \inlinecode{jar}, \inlinecode{npm}, imagenes y versiones internas.
+		\item \highlight{Argo CD:} despliegue GitOps en Kubernetes. Sincroniza el estado del cluster con manifiestos en Git.
+		\item \highlight{Prometheus + Grafana:} monitoreo y visualizacion. Recolecta metricas y dispara alertas operativas.
+		\item \highlight{Snyk/Trivy:} escaneo de vulnerabilidades en dependencias e imagenes contenedor.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Como funciona un flujo basico}
+	\begin{itemize}
+		\item \step{1}{Developer hace push:} GitHub/GitLab dispara CI.
+		\item \step{2}{Build/Test:} Jenkins o pipeline nativo valida codigo.
+		\item \step{3}{Quality Gate:} SonarQube y scanner de seguridad aprueban.
+		\item \step{4}{Artifact:} se publica en Nexus o registry Docker.
+		\item \step{5}{Deploy:} Argo CD o scripts automatizados despliegan.
+		\item \step{6}{Operacion:} Prometheus/Grafana monitorean y alertan.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Cierre del curso: que sigue para ustedes}
+	\begin{darkbox}[Objetivo inmediato]
+		Entregar un repositorio final con historial limpio, PRs revisados y pipeline CI/CD funcional.
+	\end{darkbox}
+\end{frame}
+
+\quoteslide{La diferencia entre un proyecto academico y uno profesional no es el codigo: es la disciplina para versionar, probar y desplegar.}{GLUD DevOps Mindset}
+
+\thankslide{Fin del\\\hspace*{2cm}{Curso}}
+
+\end{document}
